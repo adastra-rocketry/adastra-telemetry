@@ -28,6 +28,7 @@ void BluetoothStack::Init() {
   BLE.addService(_loggerService); // Add the battery service
   _loggerServiceChar.writeValue(0); // set initial value for this characteristic
   _switchServiceChar.setValue(0);
+
   
   /* Start advertising BLE.  It will start continuously transmitting BLE
      advertising packets and will be visible to remote BLE central devices
@@ -57,10 +58,13 @@ void BluetoothStack::DoLoop(DataLogger logger) {
         // if 200ms have passed, check the battery level:
           
         if (currentMillis - _previousMillis >= 200) {
-          float values = logger.getNextEntry().Timestamp;
-          _loggerServiceChar.writeValue(values);
+          DataPoint point = logger.getNextEntry();
+          unsigned char b[sizeof(point)];
+          memcpy(b, &point, sizeof(point));
+          unsigned char c = *b;
+          _loggerServiceChar.writeValue(c);
           Serial.print("new value: ");
-          Serial.println(values);
+          //Serial.println(values);
           _previousMillis = currentMillis;
         }
       } else {

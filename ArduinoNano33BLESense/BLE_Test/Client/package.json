@@ -11,6 +11,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "noble-uwp": "^0.6.2"
+    "noble": "^1.9.1"
   }
 }

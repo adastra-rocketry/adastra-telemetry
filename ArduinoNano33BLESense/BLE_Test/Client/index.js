@@ -1,4 +1,4 @@
-var noble = require('noble-uwp');
+var noble = require('noble');
 var readline = require('readline');
 
 noble.on('stateChange', function(state) {
@@ -34,14 +34,21 @@ function enterInteractiveMode(peripheral, callback) {
   console.log("exit,     e               exits interactive mode and returns to BT search");
   console.log("reset,    r               reset datalogger");
   console.log("download, d               download data");
-
-  repl(rl, peripheral, callback);
+  peripheral.connect(function(error) {
+    peripheral.discoverAllServicesAndCharacteristics(function(error, services, characteristics) {
+      repl(rl, characteristics, callback);
+    });
+  });
 }
 
-function repl(rl, peripheral, callback) {
-  peripheral.connect(function(error) {
-    peripheral.discoverServices([], function(error, services) {
-      console.log(JSON.stringify(services));
+function repl(rl, characteristics, callback) {
+
+      console.log(characteristics);
+      var count = characteristics.find(f => f.uuid == "2ac0");
+
+      function cont() {
+        repl(rl, characteristics, callback); //Calling this function again to ask new question
+      }
 
       rl.question('Command: ', function (answer) {
         switch (answer) {
@@ -52,15 +59,25 @@ function repl(rl, peripheral, callback) {
           case 'reset':
           case 'r':
             break;
+          case 'count':
+          case 'c':
+              count.read((error, data) => {
+                console.log(data.length)
+                data = data.readInt8();
+                if(error) {
+                  console.log("Error while retrieving count");
+                } else {
+                  console.log(`There are currently ${data} datapoints in the logger.`);
+                }
+                cont();
+              });
           case 'download':
           case 'd':
-
+            break;
           default:
             console.log(`Unknown command: ${answer}`)
+            cont();
             break;
         }
-        repl(rl, peripheral, callback); //Calling this function again to ask new question
-      });
-    });
   });
 }
