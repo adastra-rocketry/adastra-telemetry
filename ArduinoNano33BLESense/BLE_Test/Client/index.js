@@ -60,6 +60,7 @@ function repl(rl, characteristics, callback) {
             callback();
           case 'reset':
           case 'r':
+            cont();
             break;
           case 'count':
           case 'c':
@@ -75,6 +76,7 @@ function repl(rl, characteristics, callback) {
               });
           case 'download':
           case 'd':
+            cont();
             break;
           default:
             console.log(`Unknown command: ${answer}`)
