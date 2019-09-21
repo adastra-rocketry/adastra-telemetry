@@ -32,11 +32,15 @@ function enterInteractiveMode(peripheral, callback) {
   console.log("Connected to " + peripheral.advertisement.localName);
   console.log("Possible commands are:");
   console.log("exit,     e               exits interactive mode and returns to BT search");
+  console.log("count,    c               current count of datapoints");
   console.log("reset,    r               reset datalogger");
   console.log("download, d               download data");
   peripheral.connect(function(error) {
     peripheral.discoverAllServicesAndCharacteristics(function(error, services, characteristics) {
-      repl(rl, characteristics, callback);
+      repl(rl, characteristics, () => {
+        peripheral.disconnect();
+        callback();
+      });
     });
   });
 }
