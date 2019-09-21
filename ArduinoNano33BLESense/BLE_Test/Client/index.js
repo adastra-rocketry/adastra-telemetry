@@ -1,5 +1,5 @@
-var noble = require('noble');
-var readline = require('readline');
+const noble = require('noble');
+const readline = require('readline');
 
 noble.on('stateChange', function(state) {
   if (state === 'poweredOn') {
@@ -12,8 +12,8 @@ noble.on('stateChange', function(state) {
 });
 noble.on('discover', function(peripheral) {
   console.log('peripheral with ID ' + peripheral.id + ' found');
-  var advertisement = peripheral.advertisement;
-  var localName = advertisement.localName;
+  let advertisement = peripheral.advertisement;
+  let localName = advertisement.localName;
 
   if (localName == "AdAstra Telemetry") {
     noble.stopScanning();
@@ -25,7 +25,7 @@ noble.on('discover', function(peripheral) {
 });
 
 function enterInteractiveMode(peripheral, callback) {
-  var rl = readline.createInterface({
+  let rl = readline.createInterface({
     input: process.stdin,
     output: process.stdout
   });
@@ -48,13 +48,13 @@ function enterInteractiveMode(peripheral, callback) {
 function repl(rl, characteristics, callback) {
 
       //console.log(characteristics);
-      var count = characteristics.find(f => f.uuid == "2ac0");
-      var logger = characteristics.find(f => f.uuid == "2A3D");
-      var command = characteristics.find(f => f.uuid == "19B10001-E8F2-537E-4F6C-D104768A1214");
+      let count = characteristics.find(f => f.uuid == "2ac0");
+      let logger = characteristics.find(f => f.uuid == "2A3D");
+      let command = characteristics.find(f => f.uuid == "19B10001-E8F2-537E-4F6C-D104768A1214");
 
-      function cont() {
+      let cont = () => {
         repl(rl, characteristics, callback); //Calling this function again to ask new question
-      }
+      };
 
       rl.question('Command: ', function (answer) {
         switch (answer) {
@@ -62,6 +62,7 @@ function repl(rl, characteristics, callback) {
           case 'e':
             rl.close();
             callback();
+            break;
           case 'reset':
           case 'r':
             cont();
@@ -78,6 +79,7 @@ function repl(rl, characteristics, callback) {
                 }
                 cont();
               });
+              break;
           case 'download':
           case 'd':
             cont();
