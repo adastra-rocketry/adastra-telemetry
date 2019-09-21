@@ -11,6 +11,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "noble": "^1.9.1"
+    "noble": "^1.9.1",
+    "bluetooth-hci-socket": "https://github.com/noble/node-bluetooth-hci-socket.git"
   }
 }
