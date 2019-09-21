@@ -43,8 +43,10 @@ function enterInteractiveMode(peripheral, callback) {
 
 function repl(rl, characteristics, callback) {
 
-      console.log(characteristics);
+      //console.log(characteristics);
       var count = characteristics.find(f => f.uuid == "2ac0");
+      var logger = characteristics.find(f => f.uuid == "2A3D");
+      var command = characteristics.find(f => f.uuid == "19B10001-E8F2-537E-4F6C-D104768A1214");
 
       function cont() {
         repl(rl, characteristics, callback); //Calling this function again to ask new question
@@ -63,7 +65,7 @@ function repl(rl, characteristics, callback) {
           case 'c':
               count.read((error, data) => {
                 console.log(data.length)
-                data = data.readInt8();
+                data = data.readInt16BE();
                 if(error) {
                   console.log("Error while retrieving count");
                 } else {

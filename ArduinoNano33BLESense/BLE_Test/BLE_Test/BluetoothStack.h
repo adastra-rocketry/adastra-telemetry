@@ -28,7 +28,7 @@ class BluetoothStack
         BLERead | BLENotify};
     BLEUnsignedCharCharacteristic _switchServiceChar{"19B10001-E8F2-537E-4F6C-D104768A1214", BLERead | BLEWrite};
 
-    BLEUnsignedCharCharacteristic _itemCountServiceChar{"2AC0", BLERead};
+    BLECharacteristic _itemCountServiceChar{"2AC0", BLERead, sizeof(int)};
 
     void ProcessCommand(DataLogger logger);
 };

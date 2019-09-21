@@ -46,14 +46,22 @@ void BluetoothStack::DoLoop(DataLogger logger) {
     // print the central's BT address:
     Serial.println(central.address());
     Serial.print("Current count of gathered data: ");
-    Serial.println(logger.getCounter());
-    _itemCountServiceChar.writeValue(logger.getCounter()); // and publish it via BT
+    int count = logger.getCounter();
+    Serial.println(count);
+    unsigned char bytes[2];
+    bytes[0] = (count >> 8) & 0xFF;
+    bytes[1] = count & 0xFF;
     
+    _itemCountServiceChar.writeValue(bytes, sizeof(bytes)); // and publish it via BT
+    Serial.println("Wrote count char");
     while (central.connected()) {
+      Serial.println("loop");
       ProcessCommand(logger);
       _led.setColor(false, false, true);
       bool hasNextEntry = logger.hasNextEntry();
       if(_shouldSendLog && hasNextEntry) {
+        
+        Serial.println("shouldsend");
         long currentMillis = millis();
         // if 200ms have passed, check the battery level:
           
