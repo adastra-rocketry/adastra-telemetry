@@ -26,7 +26,7 @@ void BluetoothStack::Init() {
   _loggerService.addCharacteristic(_switchServiceChar);
   _loggerService.addCharacteristic(_itemCountServiceChar);
   BLE.addService(_loggerService); // Add the battery service
-  _loggerServiceChar.writeValue(0); // set initial value for this characteristic
+  //_loggerServiceChar.writeValue(0); // set initial value for this characteristic
   _switchServiceChar.setValue(0);
 
   
@@ -45,23 +45,14 @@ void BluetoothStack::DoLoop(DataLogger logger) {
     Serial.print("Connected to central: ");
     // print the central's BT address:
     Serial.println(central.address());
-    Serial.print("Current count of gathered data: ");
-    int count = logger.getCounter();
-    Serial.println(count);
-    unsigned char bytes[2];
-    bytes[0] = (count >> 8) & 0xFF;
-    bytes[1] = count & 0xFF;
-    
-    _itemCountServiceChar.writeValue(bytes, sizeof(bytes)); // and publish it via BT
-    Serial.println("Wrote count char");
+
+    WriteCount(logger);
+
     while (central.connected()) {
-      Serial.println("loop");
       ProcessCommand(logger);
       _led.setColor(false, false, true);
       bool hasNextEntry = logger.hasNextEntry();
       if(_shouldSendLog && hasNextEntry) {
-        
-        Serial.println("shouldsend");
         long currentMillis = millis();
         // if 200ms have passed, check the battery level:
           
@@ -69,8 +60,7 @@ void BluetoothStack::DoLoop(DataLogger logger) {
           DataPoint point = logger.getNextEntry();
           unsigned char b[sizeof(point)];
           memcpy(b, &point, sizeof(point));
-          unsigned char c = *b;
-          _loggerServiceChar.writeValue(c);
+          _loggerServiceChar.writeValue(b, sizeof(b));
           Serial.print("new value: ");
           //Serial.println(values);
           _previousMillis = currentMillis;
@@ -85,6 +75,18 @@ void BluetoothStack::DoLoop(DataLogger logger) {
   }
 }
 
+void BluetoothStack::WriteCount(DataLogger logger) {
+    Serial.print("Current count of gathered data: ");
+    int count = logger.getCounter();
+    Serial.println(count);
+    unsigned char bytes[2];
+    bytes[0] = (count >> 8) & 0xFF;
+    bytes[1] = count & 0xFF;
+    
+    _itemCountServiceChar.writeValue(bytes, sizeof(bytes)); // and publish it via BT
+    Serial.println("Wrote count char");
+}
+
 void BluetoothStack::ProcessCommand(DataLogger logger) {
   if (_switchServiceChar.written()) {
     char command = _switchServiceChar.value();
@@ -94,6 +96,7 @@ void BluetoothStack::ProcessCommand(DataLogger logger) {
         break;
       case 'c':
         logger.empty();
+        //WriteCount(logger);
         break;
       default:
         Serial.print("Unknown command: ");

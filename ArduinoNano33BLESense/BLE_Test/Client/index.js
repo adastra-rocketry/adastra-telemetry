@@ -1,21 +1,25 @@
-const noble = require('noble');
+const noble = require('noble-uwp');
 const readline = require('readline');
 
-noble.on('stateChange', function(state) {
-  if (state === 'poweredOn') {
-    console.log("Starting scan...");
-    noble.startScanning(undefined, true);
+if (noble.state === "poweredOn") {
+  noble.startScanning();
+}
+
+noble.on("stateChange", function(state) {
+  console.log("BLE State change: " + state);
+  if (state === "poweredOn") {
+    noble.startScanning();
   } else {
-    console.log("Error:" + state + " stopping...");
     noble.stopScanning();
   }
 });
+
 noble.on('discover', function(peripheral) {
   console.log('peripheral with ID ' + peripheral.id + ' found');
   let advertisement = peripheral.advertisement;
   let localName = advertisement.localName;
 
-  if (localName == "AdAstra Telemetry") {
+  if (peripheral.id == "f1e2c75cb032") {
     noble.stopScanning();
     enterInteractiveMode(peripheral, () => {
       console.log("Starting scan...");
@@ -49,11 +53,18 @@ function repl(rl, characteristics, callback) {
 
       //console.log(characteristics);
       let count = characteristics.find(f => f.uuid == "2ac0");
-      let logger = characteristics.find(f => f.uuid == "2A3D");
-      let command = characteristics.find(f => f.uuid == "19B10001-E8F2-537E-4F6C-D104768A1214");
+      let logger = characteristics.find(f => f.uuid == "2a3d");
+      let command = characteristics.find(f => f.uuid == "19b10001e8f2537e4f6cd104768a1214");
+
+
 
       let cont = () => {
         repl(rl, characteristics, callback); //Calling this function again to ask new question
+      };
+
+      let writeCommand = (c, cb) => {
+        let buffer = Buffer.from(c, 'ascii');
+        command.write(buffer, false, cb);
       };
 
       rl.question('Command: ', function (answer) {
@@ -65,7 +76,7 @@ function repl(rl, characteristics, callback) {
             break;
           case 'reset':
           case 'r':
-            cont();
+            writeCommand('c', cont);
             break;
           case 'count':
           case 'c':
@@ -82,7 +93,18 @@ function repl(rl, characteristics, callback) {
               break;
           case 'download':
           case 'd':
-            cont();
+            logger.on('data', (data, isNotification) => {
+              console.log(data);
+            });
+
+            logger.subscribe((error) => {
+              console.log("notify func" + error);
+              
+              writeCommand('d', () => {
+                //cont();
+              });
+            });
+            
             break;
           default:
             console.log(`Unknown command: ${answer}`)

@@ -32,6 +32,7 @@ int DataLogger::getCounter() {
 
 
 void DataLogger::empty() {
+  Serial.println("clearing");
   _counter = 0;
   _positionCounter = 0;
 }
