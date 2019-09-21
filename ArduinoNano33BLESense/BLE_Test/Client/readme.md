@@ -8,7 +8,7 @@ This tool search for BLE devices named "AdAstra Telemetry" and connects to them.
 
 1. install node-gyp pre-requirements:
 
-  npm install --global --production windows-build-tools
+   ```npm install --global --production windows-build-tools```
 
 2. follow the installation guide from https://github.com/noble/node-bluetooth-hci-socket#Windows and replace the BLE driver using Zadig
 
