@@ -5,7 +5,7 @@ DataLogger::DataLogger() {
   
 }
 
-void DataLogger::saveValue(DataPoint newValue) {
+void DataLogger::saveValue(DataPoint& newValue) {
   _storage[_counter] = newValue;
   _counter++;
 }

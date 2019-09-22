@@ -98,18 +98,23 @@ function repl(rl, characteristics, callback) {
               path: fileName,
               fieldDelimiter : ';',
               header: [
-                {id: 'datapointType', title: 'Type'},
                 {id: 'timestamp', title: 'Timestamp'},
-                {id: 'value', title: 'Value'}
+                {id: 'pressure', title: 'Pressure'},
+                {id: 'temperature', title: 'Temperature'},
+                {id: 'acc_x', title: 'Acceleration X'},
+                {id: 'acc_y', title: 'Acceleration Y'},
+                {id: 'acc_z', title: 'Acceleration Z'}
               ]
             });
             let processData = (data) => {
               let commandObject = {};
               console.log(data.length)
-              commandObject['type'] = data.readInt16LE();
-              commandObject['datapointType'] = data.readInt16LE(6);
-              commandObject['timestamp'] = data.readUInt32LE(8);
-              commandObject['value'] = Math.round(data.readFloatLE(12) * 10000) / 10000;
+              commandObject['timestamp'] = data.readUInt32LE(4);
+              commandObject['pressure'] = Math.round(data.readFloatLE(8) * 10000) / 10000;
+              commandObject['temperature'] = Math.round(data.readFloatLE(12) * 10000) / 10000;
+              commandObject['acc_x'] = Math.round(data.readFloatLE(16) * 10000) / 10000;
+              commandObject['acc_y'] = Math.round(data.readFloatLE(20) * 10000) / 10000;
+              commandObject['acc_z'] = Math.round(data.readFloatLE(24) * 10000) / 10000;
               return commandObject;
             };
 

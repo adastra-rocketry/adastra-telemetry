@@ -6,15 +6,13 @@
 
 #include "Arduino.h"
 
-enum DataPoint_Type {
-  Pressure = 0,
-  Temperature = 1  
-};
-
 struct DataPoint {
-  DataPoint_Type Type;
   unsigned long Timestamp;
-  float Value;
+  float Pressure;
+  float Temperature;
+  float Acc_X;
+  float Acc_Y;
+  float Acc_Z;
 };
 
 class DataLogger
@@ -22,7 +20,7 @@ class DataLogger
   public:
     DataLogger();
     bool hasSpaceLeft();
-    void saveValue(DataPoint newValue);
+    void saveValue(DataPoint& newValue);
     void empty();
     DataPoint getNextEntry();
     bool hasNextEntry();
