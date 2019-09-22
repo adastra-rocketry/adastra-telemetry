@@ -1,5 +1,8 @@
 const noble = require('noble-uwp');
 const readline = require('readline');
+const createCsvWriter = require('csv-writer').createObjectCsvWriter;
+
+const deviceUUID = "f1e2c75cb032";
 
 if (noble.state === "poweredOn") {
   noble.startScanning();
@@ -15,11 +18,8 @@ noble.on("stateChange", function(state) {
 });
 
 noble.on('discover', function(peripheral) {
-  console.log('peripheral with ID ' + peripheral.id + ' found');
-  let advertisement = peripheral.advertisement;
-  let localName = advertisement.localName;
-
-  if (peripheral.id == "f1e2c75cb032") {
+  if (peripheral.id == deviceUUID) {
+    console.log('peripheral with ID ' + peripheral.id + ' found');
     noble.stopScanning();
     enterInteractiveMode(peripheral, () => {
       console.log("Starting scan...");
@@ -93,8 +93,38 @@ function repl(rl, characteristics, callback) {
               break;
           case 'download':
           case 'd':
+            let fileName = 'out.csv';
+            const csvWriter = createCsvWriter({
+              path: fileName,
+              fieldDelimiter : ';',
+              header: [
+                {id: 'datapointType', title: 'Type'},
+                {id: 'timestamp', title: 'Timestamp'},
+                {id: 'value', title: 'Value'}
+              ]
+            });
+            let processData = (data) => {
+              let commandObject = {};
+              console.log(data.length)
+              commandObject['type'] = data.readInt16LE();
+              commandObject['datapointType'] = data.readInt16LE(6);
+              commandObject['timestamp'] = data.readUInt32LE(8);
+              commandObject['value'] = Math.round(data.readFloatLE(12) * 10000) / 10000;
+              return commandObject;
+            };
+
+
             logger.on('data', (data, isNotification) => {
-              console.log(data);
+              if(isNotification) {
+                console.log(data);
+                let obj = processData(data);
+                if(obj.type == 0) {
+                  csvWriter.writeRecords([obj]);
+                } else {
+                  console.log("Transfer done");
+                  cont();
+                }
+              }
             });
 
             logger.subscribe((error) => {
