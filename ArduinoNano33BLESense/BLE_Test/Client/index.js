@@ -109,6 +109,7 @@ function repl(rl, characteristics, callback) {
             let processData = (data) => {
               let commandObject = {};
               console.log(data.length)
+              commandObject['type'] = data.readInt16LE();
               commandObject['timestamp'] = data.readUInt32LE(4);
               commandObject['pressure'] = Math.round(data.readFloatLE(8) * 10000) / 10000;
               commandObject['temperature'] = Math.round(data.readFloatLE(12) * 10000) / 10000;

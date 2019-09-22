@@ -111,7 +111,7 @@ void BluetoothStack::ProcessCommand(DataLogger& logger) {
         break;
       case 'c':
         logger.empty();
-        //WriteCount(logger);
+        WriteCount(logger);
         break;
       default:
         Serial.print("Unknown command: ");
