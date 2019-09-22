@@ -1,6 +1,8 @@
 const noble = require('noble-uwp');
 const readline = require('readline');
 const createCsvWriter = require('csv-writer').createObjectCsvWriter;
+const calcAlt = require('./calc_altitude.js');
+
 
 const deviceUUID = "f1e2c75cb032";
 
@@ -110,7 +112,8 @@ function repl(rl, characteristics, peripheral, callback) {
                 {id: 'temperature', title: 'Temperature'},
                 {id: 'acc_x', title: 'Acceleration X'},
                 {id: 'acc_y', title: 'Acceleration Y'},
-                {id: 'acc_z', title: 'Acceleration Z'}
+                {id: 'acc_z', title: 'Acceleration Z'},
+                {id: 'calcedAlt', title: 'Altitude (approx)'}
               ]
             });
             let processData = (data) => {
@@ -123,6 +126,7 @@ function repl(rl, characteristics, peripheral, callback) {
               commandObject['acc_x'] = Math.round(data.readFloatLE(16) * 10000) / 10000;
               commandObject['acc_y'] = Math.round(data.readFloatLE(20) * 10000) / 10000;
               commandObject['acc_z'] = Math.round(data.readFloatLE(24) * 10000) / 10000;
+              commandObject['calcedAlt'] = calcAlt(commandObject['pressure'] * 10, commandObject['temperature']);
               return commandObject;
             };
 
