@@ -12,7 +12,7 @@ unsigned long previousMillis = 0;
 Debug_LED led(23,24,22); 
 
 void createDatapoint() {
-  float acc_x, acc_y, acc_z = -999;
+  float acc_x = -999, acc_y = -999, acc_z = -999;
   if (IMU.accelerationAvailable()) {
     IMU.readAcceleration(acc_x,acc_y,acc_z);
   }
@@ -30,7 +30,7 @@ void setup() {
   //while (!Serial);
 
   Serial.println("AdAstra Telemetry");
-  led.setColor(false, true, false);
+  
   
   if (!BARO.begin()) {
     Serial.println("Failed to initialize pressure sensor!");
@@ -48,6 +48,7 @@ void setup() {
   }
   
   ble.Init();
+  led.setColor(false, true, false);
 }
 
 void loop() {
@@ -59,6 +60,7 @@ void loop() {
     previousMillis = currentMillis;
     Serial.println("Saving new Value");
     createDatapoint();
+    BLE.advertise();
   }
   
   ble.DoLoop(logger);

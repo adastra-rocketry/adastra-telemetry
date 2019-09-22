@@ -5,13 +5,13 @@ const createCsvWriter = require('csv-writer').createObjectCsvWriter;
 const deviceUUID = "f1e2c75cb032";
 
 if (noble.state === "poweredOn") {
-  noble.startScanning();
+  noble.startScanning([], true);
 }
 
 noble.on("stateChange", function(state) {
   console.log("BLE State change: " + state);
   if (state === "poweredOn") {
-    noble.startScanning();
+    noble.startScanning([], true);
   } else {
     noble.stopScanning();
   }
@@ -35,13 +35,14 @@ function enterInteractiveMode(peripheral, callback) {
   });
   console.log("Connected to " + peripheral.advertisement.localName);
   console.log("Possible commands are:");
-  console.log("exit,     e               exits interactive mode and returns to BT search");
-  console.log("count,    c               current count of datapoints");
-  console.log("reset,    r               reset datalogger");
-  console.log("download, d               download data");
+  console.log("exit,       e               exits the programm");
+  console.log("search,     s               search for other loggers");
+  console.log("count,      c               current count of datapoints");
+  console.log("reset,      r               reset datalogger");
+  console.log("download,   d               download data");
   peripheral.connect(function(error) {
     peripheral.discoverAllServicesAndCharacteristics(function(error, services, characteristics) {
-      repl(rl, characteristics, () => {
+      repl(rl, characteristics, peripheral, () => {
         peripheral.disconnect();
         callback();
       });
@@ -49,7 +50,7 @@ function enterInteractiveMode(peripheral, callback) {
   });
 }
 
-function repl(rl, characteristics, callback) {
+function repl(rl, characteristics, peripheral, callback) {
 
       //console.log(characteristics);
       let count = characteristics.find(f => f.uuid == "2ac0");
@@ -59,7 +60,7 @@ function repl(rl, characteristics, callback) {
 
 
       let cont = () => {
-        repl(rl, characteristics, callback); //Calling this function again to ask new question
+        repl(rl, characteristics, peripheral, callback); //Calling this function again to ask new question
       };
 
       let writeCommand = (c, cb) => {
@@ -69,10 +70,16 @@ function repl(rl, characteristics, callback) {
 
       rl.question('Command: ', function (answer) {
         switch (answer) {
+          case 'search':
+          case 's':
+            rl.close();
+            callback();
+            break;
           case 'exit':
           case 'e':
             rl.close();
-            callback();
+            peripheral.disconnect();
+            process.exit();
             break;
           case 'reset':
           case 'r':
@@ -108,7 +115,7 @@ function repl(rl, characteristics, callback) {
             });
             let processData = (data) => {
               let commandObject = {};
-              console.log(data.length)
+              //console.log(data.length)
               commandObject['type'] = data.readInt16LE();
               commandObject['timestamp'] = data.readUInt32LE(4);
               commandObject['pressure'] = Math.round(data.readFloatLE(8) * 10000) / 10000;
@@ -122,7 +129,7 @@ function repl(rl, characteristics, callback) {
 
             logger.on('data', (data, isNotification) => {
               if(isNotification) {
-                console.log(data);
+                //console.log(data);
                 let obj = processData(data);
                 if(obj.type == 0) {
                   csvWriter.writeRecords([obj]);
@@ -134,7 +141,7 @@ function repl(rl, characteristics, callback) {
             });
 
             logger.subscribe((error) => {
-              console.log("notify func" + error);
+              //console.log("notify func" + error);
               
               writeCommand('d', () => {
                 //cont();
