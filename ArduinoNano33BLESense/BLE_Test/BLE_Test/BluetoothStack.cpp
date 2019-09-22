@@ -39,7 +39,7 @@ void BluetoothStack::Init() {
   Serial.println("Bluetooth device active, waiting for connections...");
 }
 
-void BluetoothStack::DoLoop(DataLogger logger) {
+void BluetoothStack::DoLoop(DataLogger& logger) {
   BLEDevice central = BLE.central();
   if (central) {
     Serial.print("Connected to central: ");
@@ -53,19 +53,32 @@ void BluetoothStack::DoLoop(DataLogger logger) {
       _led.setColor(false, false, true);
       bool hasNextEntry = logger.hasNextEntry();
       if(_shouldSendLog && hasNextEntry) {
+        _transferInProgress = true;
         long currentMillis = millis();
         // if 200ms have passed, check the battery level:
           
         if (currentMillis - _previousMillis >= 200) {
           DataPoint point = logger.getNextEntry();
-          unsigned char b[sizeof(point)];
-          memcpy(b, &point, sizeof(point));
+          _transferObject.Data = point;
+          _transferObject.Type = Transfer_Type::Data; 
+          unsigned char b[sizeof(_transferObject)];
+          memcpy(b, &_transferObject, sizeof(_transferObject));
           _loggerServiceChar.writeValue(b, sizeof(b));
           Serial.print("new value: ");
           //Serial.println(values);
           _previousMillis = currentMillis;
         }
       } else {
+        if(_transferInProgress) {
+          Serial.println("Stopping transmission");
+          _transferObject.Type = Transfer_Type::End; 
+          unsigned char b[sizeof(_transferObject)];
+          memcpy(b, &_transferObject, sizeof(_transferObject));
+
+          _loggerServiceChar.writeValue(b, sizeof(b));
+          _transferInProgress = false;
+        }
+
         _shouldSendLog = false;
       }
     }
@@ -75,7 +88,7 @@ void BluetoothStack::DoLoop(DataLogger logger) {
   }
 }
 
-void BluetoothStack::WriteCount(DataLogger logger) {
+void BluetoothStack::WriteCount(DataLogger& logger) {
     Serial.print("Current count of gathered data: ");
     int count = logger.getCounter();
     Serial.println(count);
@@ -87,9 +100,11 @@ void BluetoothStack::WriteCount(DataLogger logger) {
     Serial.println("Wrote count char");
 }
 
-void BluetoothStack::ProcessCommand(DataLogger logger) {
+void BluetoothStack::ProcessCommand(DataLogger& logger) {
   if (_switchServiceChar.written()) {
     char command = _switchServiceChar.value();
+    Serial.print("Got new command:");
+    Serial.println(command);
     switch(command) {
       case 'd':
         _shouldSendLog = true;

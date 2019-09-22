@@ -26,7 +26,7 @@ void setup() {
   led.setColor(true, false, false);
   // put your setup code here, to run once:
   Serial.begin(9600);
-  while (!Serial);
+  //while (!Serial);
 
   Serial.println("AdAstra Telemetry");
   led.setColor(false, true, false);

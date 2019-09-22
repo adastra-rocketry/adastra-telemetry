@@ -7,8 +7,8 @@
 #include "Arduino.h"
 
 enum DataPoint_Type {
-  Pressure,
-  Temperature  
+  Pressure = 0,
+  Temperature = 1  
 };
 
 struct DataPoint {
