@@ -19,12 +19,15 @@ noble.on("stateChange", function(state) {
   }
 });
 
+let found = false;
 noble.on('discover', function(peripheral) {
-  if (peripheral.id == deviceUUID) {
+  if (peripheral.id == deviceUUID && !found) {
+    found = true;
     console.log('peripheral with ID ' + peripheral.id + ' found');
     noble.stopScanning();
     enterInteractiveMode(peripheral, () => {
       console.log("Starting scan...");
+      found = false;
       noble.startScanning();
     });
   }
