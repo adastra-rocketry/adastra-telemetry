@@ -3,6 +3,7 @@
 #include "BluetoothStack.h"
 #include "DataLogger.h"
 #include "Debug_LED.h"
+#include "Settings.h"
 
 BluetoothStack::BluetoothStack() {
   
@@ -11,7 +12,7 @@ BluetoothStack::BluetoothStack() {
 void BluetoothStack::Init() {
   // begin initialization
   if (!BLE.begin()) {
-    Serial.println("starting BLE failed!");
+    if(DEBUG) Serial.println("starting BLE failed!");
     _led.setColor(true, false, false);
     while (1);
   }  
@@ -36,15 +37,15 @@ void BluetoothStack::Init() {
 
   // start advertising
   BLE.advertise();
-  Serial.println("Bluetooth device active, waiting for connections...");
+  if(DEBUG) Serial.println("Bluetooth device active, waiting for connections...");
 }
 
 void BluetoothStack::DoLoop(DataLogger& logger) {
   BLEDevice central = BLE.central();
   if (central) {
-    Serial.print("Connected to central: ");
+    if(DEBUG) Serial.print("Connected to central: ");
     // print the central's BT address:
-    Serial.println(central.address());
+    if(DEBUG) Serial.println(central.address());
 
     WriteCount(logger);
 
@@ -57,20 +58,20 @@ void BluetoothStack::DoLoop(DataLogger& logger) {
         long currentMillis = millis();
         // if 200ms have passed, check the battery level:
           
-        if (currentMillis - _previousMillis >= 200) {
+        if (currentMillis - _previousMillis >= DOWNLOAD_SPEED) {
           DataPoint point = logger.getNextEntry();
           _transferObject.Data = point;
           _transferObject.Type = Transfer_Type::Data; 
           unsigned char b[sizeof(_transferObject)];
           memcpy(b, &_transferObject, sizeof(_transferObject));
           _loggerServiceChar.writeValue(b, sizeof(b));
-          Serial.print("new value: ");
+          if(DEBUG) Serial.print("new value: ");
           //Serial.println(values);
           _previousMillis = currentMillis;
         }
       } else {
         if(_transferInProgress) {
-          Serial.println("Stopping transmission");
+          if(DEBUG) Serial.println("Stopping transmission");
           _transferObject.Type = Transfer_Type::End; 
           unsigned char b[sizeof(_transferObject)];
           memcpy(b, &_transferObject, sizeof(_transferObject));
@@ -83,28 +84,34 @@ void BluetoothStack::DoLoop(DataLogger& logger) {
       }
     }
     _led.setColor(false, true, false);
-    Serial.print("Disconnected from central: ");
-    Serial.println(central.address());    
+    
+    if(DEBUG) {
+      Serial.print("Disconnected from central: ");
+      Serial.println(central.address());   
+    }
   }
 }
 
 void BluetoothStack::WriteCount(DataLogger& logger) {
-    Serial.print("Current count of gathered data: ");
+    if(DEBUG) Serial.print("Current count of gathered data: ");
     int count = logger.getCounter();
-    Serial.println(count);
+    if(DEBUG) Serial.println(count);
     unsigned char bytes[2];
     bytes[0] = (count >> 8) & 0xFF;
     bytes[1] = count & 0xFF;
     
     _itemCountServiceChar.writeValue(bytes, sizeof(bytes)); // and publish it via BT
-    Serial.println("Wrote count char");
+    if(DEBUG) Serial.println("Wrote count char");
 }
 
 void BluetoothStack::ProcessCommand(DataLogger& logger) {
   if (_switchServiceChar.written()) {
     char command = _switchServiceChar.value();
-    Serial.print("Got new command:");
-    Serial.println(command);
+    if(DEBUG) {
+      Serial.print("Got new command:");
+      Serial.println(command);
+    }
+
     switch(command) {
       case 'd':
         _shouldSendLog = true;
@@ -114,8 +121,10 @@ void BluetoothStack::ProcessCommand(DataLogger& logger) {
         WriteCount(logger);
         break;
       default:
-        Serial.print("Unknown command: ");
-        Serial.println(command);
+        if(DEBUG) {
+          Serial.print("Unknown command: ");
+          Serial.println(command);
+        }
     }
     
   }

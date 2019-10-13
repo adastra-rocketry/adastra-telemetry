@@ -1,5 +1,6 @@
 #include "Arduino.h"
 #include "DataLogger.h"
+#include "Settings.h"
 
 DataLogger::DataLogger() {
   
@@ -32,7 +33,7 @@ int DataLogger::getCounter() {
 
 
 void DataLogger::empty() {
-  Serial.println("clearing");
+  if(DEBUG) Serial.println("clearing");
   _counter = 0;
   _positionCounter = 0;
 }
