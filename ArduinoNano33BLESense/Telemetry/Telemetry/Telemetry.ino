@@ -53,7 +53,6 @@ void initTemperatureSensor() {
 
 void setup() {
   led.setColor(true, false, false);
-  // put your setup code here, to run once:
   
   if(DEBUG) {
     Serial.begin(9600);
