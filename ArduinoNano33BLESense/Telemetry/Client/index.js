@@ -110,6 +110,7 @@ function repl(rl, characteristics, peripheral, callback) {
               path: fileName,
               fieldDelimiter : ';',
               header: [
+                {id: 'state', title: 'Vehicle state'},
                 {id: 'timestamp', title: 'Timestamp'},
                 {id: 'pressure', title: 'Pressure'},
                 {id: 'temperature', title: 'Temperature'},
@@ -123,12 +124,13 @@ function repl(rl, characteristics, peripheral, callback) {
               let commandObject = {};
               //console.log(data.length)
               commandObject['type'] = data.readInt16LE();
-              commandObject['timestamp'] = data.readUInt32LE(4);
-              commandObject['pressure'] = Math.round(data.readFloatLE(8) * 10000) / 10000;
-              commandObject['temperature'] = Math.round(data.readFloatLE(12) * 10000) / 10000;
-              commandObject['acc_x'] = Math.round(data.readFloatLE(16) * 10000) / 10000;
-              commandObject['acc_y'] = Math.round(data.readFloatLE(20) * 10000) / 10000;
-              commandObject['acc_z'] = Math.round(data.readFloatLE(24) * 10000) / 10000;
+              commandObject['state'] = data.readInt16LE(4);
+              commandObject['timestamp'] = data.readUInt32LE(8);
+              commandObject['pressure'] = Math.round(data.readFloatLE(12) * 10000) / 10000;
+              commandObject['temperature'] = Math.round(data.readFloatLE(16) * 10000) / 10000;
+              commandObject['acc_x'] = Math.round(data.readFloatLE(20) * 10000) / 10000;
+              commandObject['acc_y'] = Math.round(data.readFloatLE(24) * 10000) / 10000;
+              commandObject['acc_z'] = Math.round(data.readFloatLE(28) * 10000) / 10000;
               commandObject['calcedAlt'] = calcAlt(commandObject['pressure'] * 10, commandObject['temperature']);
               return commandObject;
             };

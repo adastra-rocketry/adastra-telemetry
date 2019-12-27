@@ -23,7 +23,7 @@ class BluetoothStack
 {
   public:
     BluetoothStack();
-    void DoLoop(DataLogger& logger);
+    void DoLoop(DataLogger& logger, int state);
     void Init();
   private:
     //DataLogger _logger;
@@ -41,9 +41,11 @@ class BluetoothStack
     BLEUnsignedCharCharacteristic _switchServiceChar{"19B10001-E8F2-537E-4F6C-D104768A1214", BLERead | BLEWrite};
 
     BLECharacteristic _itemCountServiceChar{"2AC0", BLERead, sizeof(int)};
+    BLECharacteristic _stateServiceChar{"2AC1", BLERead, sizeof(int)};
 
     void ProcessCommand(DataLogger& logger);
     void WriteCount(DataLogger& logger);
+    void WriteState(int state);
 };
 
 #endif

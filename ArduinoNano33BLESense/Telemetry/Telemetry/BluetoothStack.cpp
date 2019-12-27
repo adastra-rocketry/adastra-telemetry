@@ -26,6 +26,7 @@ void BluetoothStack::Init() {
   _loggerService.addCharacteristic(_loggerServiceChar);
   _loggerService.addCharacteristic(_switchServiceChar);
   _loggerService.addCharacteristic(_itemCountServiceChar);
+  _loggerService.addCharacteristic(_stateServiceChar);
   BLE.addService(_loggerService); // Add the battery service
   //_loggerServiceChar.writeValue(0); // set initial value for this characteristic
   _switchServiceChar.setValue(0);
@@ -40,7 +41,7 @@ void BluetoothStack::Init() {
   if(DEBUG) Serial.println("Bluetooth device active, waiting for connections...");
 }
 
-void BluetoothStack::DoLoop(DataLogger& logger) {
+void BluetoothStack::DoLoop(DataLogger& logger, int state) {
   BLEDevice central = BLE.central();
   if (central) {
     if(DEBUG) Serial.print("Connected to central: ");
@@ -48,8 +49,9 @@ void BluetoothStack::DoLoop(DataLogger& logger) {
     if(DEBUG) Serial.println(central.address());
 
     WriteCount(logger);
+    WriteState(state);
 
-    while (central.connected()) {
+    if (central.connected()) {
       ProcessCommand(logger);
       _led.setColor(false, false, true);
       bool hasNextEntry = logger.hasNextEntry();
@@ -93,15 +95,20 @@ void BluetoothStack::DoLoop(DataLogger& logger) {
 }
 
 void BluetoothStack::WriteCount(DataLogger& logger) {
-    if(DEBUG) Serial.print("Current count of gathered data: ");
     int count = logger.getCounter();
-    if(DEBUG) Serial.println(count);
     unsigned char bytes[2];
     bytes[0] = (count >> 8) & 0xFF;
     bytes[1] = count & 0xFF;
     
     _itemCountServiceChar.writeValue(bytes, sizeof(bytes)); // and publish it via BT
-    if(DEBUG) Serial.println("Wrote count char");
+}
+
+void BluetoothStack::WriteState(int state) {
+    unsigned char bytes[2];
+    bytes[0] = (state >> 8) & 0xFF;
+    bytes[1] = state & 0xFF;
+    
+    _stateServiceChar.writeValue(bytes, sizeof(bytes)); // and publish it via BT
 }
 
 void BluetoothStack::ProcessCommand(DataLogger& logger) {
@@ -116,7 +123,7 @@ void BluetoothStack::ProcessCommand(DataLogger& logger) {
       case 'd':
         _shouldSendLog = true;
         break;
-      case 'c':
+       case 'r':
         logger.empty();
         WriteCount(logger);
         break;

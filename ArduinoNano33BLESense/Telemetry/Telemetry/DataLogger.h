@@ -6,7 +6,16 @@
 
 #include "Arduino.h"
 
+enum Vehicle_State {
+  Idle = 0,
+  LaunchIdle = 1,
+  Ascending = 2,
+  Descending = 3,
+  Landed = 4
+};
+
 struct DataPoint {
+  Vehicle_State State;
   unsigned long Timestamp;
   float Pressure;
   float Temperature;

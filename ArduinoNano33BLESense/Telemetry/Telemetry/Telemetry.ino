@@ -1,54 +1,37 @@
 #include "Settings.h"
-
-#include <Arduino_LPS22HB.h>
-#include <Arduino_HTS221.h>
-#include <Arduino_LSM9DS1.h>
 #include "DataLogger.h"
 #include "BluetoothStack.h"
 #include "Debug_LED.h"
+#include "Sensors.h"
 
 DataLogger logger;
 BluetoothStack ble;
 unsigned long previousMillis = 0;
 
-Debug_LED led(23,24,22); 
+Vehicle_State State = Vehicle_State::LaunchIdle;
 
-void createDatapoint() {
-  float acc_x = -999, acc_y = -999, acc_z = -999;
-  if (IMU.accelerationAvailable()) {
-    IMU.readAcceleration(acc_x,acc_y,acc_z);
-  }
-  float temperature = HTS.readTemperature();
-  float pressure = BARO.readPressure();
+Debug_LED led(23,24,22);
+
+Sensors sensors;
+
+void readSensors() {
+  float temperature = sensors.readTemperature();
+  float pressure = sensors.readPressure();
+  float acc_x, acc_y, acc_z;
+  sensors.readAcceleration(acc_x, acc_y, acc_z);
 
   if(DEBUG) {
     Serial.print("Temperature: ");
     Serial.print(temperature);
     Serial.println("°C");
   }
-  DataPoint newItem = {millis(), pressure, temperature, acc_x, acc_y, acc_z};
-  logger.saveValue(newItem);
+
+  createDataPoint(pressure, temperature, acc_x, acc_y, acc_z);
 }
 
-void initTemperatureSensor() {
-  delay(1000);
-  if (!HTS.begin()) {
-    if(DEBUG) Serial.println("Failed to init temperature sensor!");
-    HTS.end();
-    initTemperatureSensor();
-  } else {
-    float temperature = HTS.readTemperature();
-    if(DEBUG) {
-      Serial.print("Initial Temperature: ");
-      Serial.println(temperature);
-    }
-    
-    if(temperature == 0.00f) {
-      HTS.end();
-      if(DEBUG) Serial.println("Temperature sensor reads strange values!");
-      initTemperatureSensor();
-    }
-  }
+void createDataPoint(float pressure, float temperature, float acc_x, float acc_y, float acc_z) {
+  DataPoint newItem = {State, millis(), pressure, temperature, acc_x, acc_y, acc_z};
+  logger.saveValue(newItem);
 }
 
 void setup() {
@@ -56,25 +39,13 @@ void setup() {
   
   if(DEBUG) {
     Serial.begin(9600);
-    while (!Serial);
-  
+    while (!Serial);  
     Serial.println("AdAstra Telemetry");
   }
-  
-  if (!BARO.begin()) {
-    if(DEBUG) Serial.println("Failed to initialize pressure sensor!");
-    while (1);
-  }
-
-  initTemperatureSensor();
-
-  if (!IMU.begin()) {
-    if(DEBUG) Serial.println("Failed to initialize IMU!");
-    while (1);
-  }
-
-  delay(3000);
+  sensors.init();
+  delay(1000);
   ble.Init();
+  
   led.setColor(false, true, false);
 }
 
@@ -83,12 +54,11 @@ void loop() {
 
   long currentMillis = millis();
   // if 200ms have passed
-  if (logger.hasSpaceLeft() && (currentMillis - previousMillis >= SAVE_INTERVAL)) {
+  if (State > 0 && logger.hasSpaceLeft() && (currentMillis - previousMillis >= SAVE_INTERVAL)) {
     previousMillis = currentMillis;
-    if(DEBUG) Serial.println("Saving new Value");
-    createDatapoint();
-    BLE.advertise();
+    readSensors();
   }
   
-  ble.DoLoop(logger);
+  BLE.advertise();
+  ble.DoLoop(logger, State);
 }
