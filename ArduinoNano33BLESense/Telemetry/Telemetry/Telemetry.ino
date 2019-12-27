@@ -3,12 +3,13 @@
 #include "BluetoothStack.h"
 #include "Debug_LED.h"
 #include "Sensors.h"
+#include "State.h"
 
 DataLogger logger;
 BluetoothStack ble;
 unsigned long previousMillis = 0;
 
-Vehicle_State State = Vehicle_State::LaunchIdle;
+State state;
 
 Debug_LED led(23,24,22);
 
@@ -30,7 +31,7 @@ void readSensors() {
 }
 
 void createDataPoint(float pressure, float temperature, float acc_x, float acc_y, float acc_z) {
-  DataPoint newItem = {State, millis(), pressure, temperature, acc_x, acc_y, acc_z};
+  DataPoint newItem = {state.vehicleState, millis(), pressure, temperature, acc_x, acc_y, acc_z};
   logger.saveValue(newItem);
 }
 
@@ -54,11 +55,11 @@ void loop() {
 
   long currentMillis = millis();
   // if 200ms have passed
-  if (State > 0 && logger.hasSpaceLeft() && (currentMillis - previousMillis >= SAVE_INTERVAL)) {
+  if (state.vehicleState > 0 && logger.hasSpaceLeft() && (currentMillis - previousMillis >= SAVE_INTERVAL)) {
     previousMillis = currentMillis;
     readSensors();
   }
   
   BLE.advertise();
-  ble.DoLoop(logger, State);
+  ble.DoLoop(logger, state);
 }

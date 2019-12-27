@@ -8,6 +8,7 @@
 #include "DataLogger.h"
 #include <ArduinoBLE.h>
 #include "Debug_LED.h"
+#include "State.h"
 
 enum Transfer_Type {
   Data = 0,
@@ -23,7 +24,7 @@ class BluetoothStack
 {
   public:
     BluetoothStack();
-    void DoLoop(DataLogger& logger, int state);
+    void DoLoop(DataLogger& logger, State& state);
     void Init();
   private:
     //DataLogger _logger;

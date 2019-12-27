@@ -4,6 +4,7 @@
 #include "DataLogger.h"
 #include "Debug_LED.h"
 #include "Settings.h"
+#include "State.h"
 
 BluetoothStack::BluetoothStack() {
   
@@ -41,7 +42,7 @@ void BluetoothStack::Init() {
   if(DEBUG) Serial.println("Bluetooth device active, waiting for connections...");
 }
 
-void BluetoothStack::DoLoop(DataLogger& logger, int state) {
+void BluetoothStack::DoLoop(DataLogger& logger, State& state) {
   BLEDevice central = BLE.central();
   if (central) {
     if(DEBUG) Serial.print("Connected to central: ");
@@ -49,7 +50,7 @@ void BluetoothStack::DoLoop(DataLogger& logger, int state) {
     if(DEBUG) Serial.println(central.address());
 
     WriteCount(logger);
-    WriteState(state);
+    WriteState(state.vehicleState);
 
     if (central.connected()) {
       ProcessCommand(logger);
@@ -58,7 +59,6 @@ void BluetoothStack::DoLoop(DataLogger& logger, int state) {
       if(_shouldSendLog && hasNextEntry) {
         _transferInProgress = true;
         long currentMillis = millis();
-        // if 200ms have passed, check the battery level:
           
         if (currentMillis - _previousMillis >= DOWNLOAD_SPEED) {
           DataPoint point = logger.getNextEntry();
@@ -67,13 +67,10 @@ void BluetoothStack::DoLoop(DataLogger& logger, int state) {
           unsigned char b[sizeof(_transferObject)];
           memcpy(b, &_transferObject, sizeof(_transferObject));
           _loggerServiceChar.writeValue(b, sizeof(b));
-          if(DEBUG) Serial.print("new value: ");
-          //Serial.println(values);
           _previousMillis = currentMillis;
         }
       } else {
         if(_transferInProgress) {
-          if(DEBUG) Serial.println("Stopping transmission");
           _transferObject.Type = Transfer_Type::End; 
           unsigned char b[sizeof(_transferObject)];
           memcpy(b, &_transferObject, sizeof(_transferObject));
@@ -123,7 +120,7 @@ void BluetoothStack::ProcessCommand(DataLogger& logger) {
       case 'd':
         _shouldSendLog = true;
         break;
-       case 'r':
+      case 'r':
         logger.empty();
         WriteCount(logger);
         break;
