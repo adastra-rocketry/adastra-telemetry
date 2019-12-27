@@ -14,7 +14,7 @@ void State::init() {
 void State::createDataPoint(float pressure, float temperature, float acc_x, float acc_y, float acc_z) {
   DataPoint newItem = {vehicleState, millis(), pressure, temperature, acc_x, acc_y, acc_z};
   processDataPoint(newItem);
-  if(vehicleState > 0 && logger.hasSpaceLeft()) {
+  if(vehicleState != Vehicle_State::Idle && vehicleState != Vehicle_State::Landed && logger.hasSpaceLeft()) {
     logger.saveValue(newItem);
   }
 }
@@ -30,10 +30,11 @@ void State::processDataPoint(DataPoint& point) {
 
     float deltasSum = 0.0f;
     for(int k=0; k < RING_BUFFER_SIZE; k++) deltasSum += _lastPressureDeltas[k];
-
-    deltasSum = deltasSum / RING_BUFFER_SIZE;
     float deltasMid = deltasSum / RING_BUFFER_SIZE;
-
+    
+    point.PressureDelta = pressureDelta;
+    point.PressureDeltaMid = deltasMid;
+    
     currentDataPoint = point;
 
 }

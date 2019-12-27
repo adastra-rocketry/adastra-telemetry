@@ -42,7 +42,6 @@ class BluetoothStack
 
     BLECharacteristic _itemCountServiceChar{"2AC0", BLERead, sizeof(int)};
     BLECharacteristic _stateServiceChar{"2AC1", BLERead, sizeof(int)};
-    
     BLECharacteristic _currentDataPointServiceChar{"2AC2", BLERead | BLENotify | BLEIndicate, sizeof(DataPoint)};
 
     void ProcessCommand(State& state);

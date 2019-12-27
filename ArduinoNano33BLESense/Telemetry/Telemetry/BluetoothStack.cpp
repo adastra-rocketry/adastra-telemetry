@@ -128,11 +128,17 @@ void BluetoothStack::ProcessCommand(State& state) {
 
     switch(command) {
       case 'd':
+        state.vehicleState = Vehicle_State::Landed;
+        WriteState(state);
         _shouldSendLog = true;
         break;
       case 'r':
         state.logger.empty();
         WriteCount(state);
+        break;
+      case 'l':
+        state.vehicleState = Vehicle_State::LaunchIdle;
+        WriteState(state);
         break;
       default:
         if(DEBUG) {

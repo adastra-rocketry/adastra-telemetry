@@ -22,6 +22,9 @@ struct DataPoint {
   float Acc_X;
   float Acc_Y;
   float Acc_Z;
+  
+  float PressureDelta;
+  float PressureDeltaMid;
 };
 
 class DataLogger
