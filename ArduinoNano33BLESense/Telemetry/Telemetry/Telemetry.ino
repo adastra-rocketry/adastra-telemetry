@@ -5,7 +5,6 @@
 #include "Sensors.h"
 #include "State.h"
 
-DataLogger logger;
 BluetoothStack ble;
 unsigned long previousMillis = 0;
 
@@ -27,13 +26,10 @@ void readSensors() {
     Serial.println("°C");
   }
 
-  createDataPoint(pressure, temperature, acc_x, acc_y, acc_z);
+  state.createDataPoint(pressure, temperature, acc_x, acc_y, acc_z);
 }
 
-void createDataPoint(float pressure, float temperature, float acc_x, float acc_y, float acc_z) {
-  DataPoint newItem = {state.vehicleState, millis(), pressure, temperature, acc_x, acc_y, acc_z};
-  logger.saveValue(newItem);
-}
+
 
 void setup() {
   led.setColor(true, false, false);
@@ -43,6 +39,7 @@ void setup() {
     while (!Serial);  
     Serial.println("AdAstra Telemetry");
   }
+  state.init();
   sensors.init();
   delay(1000);
   ble.Init();
@@ -51,15 +48,13 @@ void setup() {
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
-
+  BLE.advertise();
+  ble.DoLoop(state);
+  
   long currentMillis = millis();
   // if 200ms have passed
-  if (state.vehicleState > 0 && logger.hasSpaceLeft() && (currentMillis - previousMillis >= SAVE_INTERVAL)) {
-    previousMillis = currentMillis;
+  if(currentMillis - previousMillis >= SAVE_INTERVAL) {
     readSensors();
+    previousMillis = currentMillis;
   }
-  
-  BLE.advertise();
-  ble.DoLoop(logger, state);
 }

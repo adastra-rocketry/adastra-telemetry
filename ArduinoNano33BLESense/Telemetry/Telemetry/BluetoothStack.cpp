@@ -28,8 +28,9 @@ void BluetoothStack::Init() {
   _loggerService.addCharacteristic(_switchServiceChar);
   _loggerService.addCharacteristic(_itemCountServiceChar);
   _loggerService.addCharacteristic(_stateServiceChar);
+  _loggerService.addCharacteristic(_currentDataPointServiceChar);
+  
   BLE.addService(_loggerService); // Add the battery service
-  //_loggerServiceChar.writeValue(0); // set initial value for this characteristic
   _switchServiceChar.setValue(0);
 
   
@@ -42,26 +43,27 @@ void BluetoothStack::Init() {
   if(DEBUG) Serial.println("Bluetooth device active, waiting for connections...");
 }
 
-void BluetoothStack::DoLoop(DataLogger& logger, State& state) {
+void BluetoothStack::DoLoop(State& state) {
   BLEDevice central = BLE.central();
   if (central) {
     if(DEBUG) Serial.print("Connected to central: ");
     // print the central's BT address:
     if(DEBUG) Serial.println(central.address());
 
-    WriteCount(logger);
-    WriteState(state.vehicleState);
+    WriteCount(state);
+    WriteState(state);
+    WriteCurrentDataPoint(state);
 
     if (central.connected()) {
-      ProcessCommand(logger);
+      ProcessCommand(state);
       _led.setColor(false, false, true);
-      bool hasNextEntry = logger.hasNextEntry();
+      bool hasNextEntry = state.logger.hasNextEntry();
       if(_shouldSendLog && hasNextEntry) {
         _transferInProgress = true;
         long currentMillis = millis();
           
         if (currentMillis - _previousMillis >= DOWNLOAD_SPEED) {
-          DataPoint point = logger.getNextEntry();
+          DataPoint point = state.logger.getNextEntry();
           _transferObject.Data = point;
           _transferObject.Type = Transfer_Type::Data; 
           unsigned char b[sizeof(_transferObject)];
@@ -91,8 +93,8 @@ void BluetoothStack::DoLoop(DataLogger& logger, State& state) {
   }
 }
 
-void BluetoothStack::WriteCount(DataLogger& logger) {
-    int count = logger.getCounter();
+void BluetoothStack::WriteCount(State& state) {
+    int count = state.logger.getCounter();
     unsigned char bytes[2];
     bytes[0] = (count >> 8) & 0xFF;
     bytes[1] = count & 0xFF;
@@ -100,7 +102,8 @@ void BluetoothStack::WriteCount(DataLogger& logger) {
     _itemCountServiceChar.writeValue(bytes, sizeof(bytes)); // and publish it via BT
 }
 
-void BluetoothStack::WriteState(int state) {
+void BluetoothStack::WriteState(State& stateObj) {
+    int state = stateObj.vehicleState;
     unsigned char bytes[2];
     bytes[0] = (state >> 8) & 0xFF;
     bytes[1] = state & 0xFF;
@@ -108,7 +111,14 @@ void BluetoothStack::WriteState(int state) {
     _stateServiceChar.writeValue(bytes, sizeof(bytes)); // and publish it via BT
 }
 
-void BluetoothStack::ProcessCommand(DataLogger& logger) {
+
+void BluetoothStack::WriteCurrentDataPoint(State& stateObj) {
+    unsigned char b[sizeof(stateObj.currentDataPoint)];
+    memcpy(b, &stateObj.currentDataPoint, sizeof(stateObj.currentDataPoint));
+    _currentDataPointServiceChar.writeValue(b, sizeof(b)); // and publish it via BT
+}
+
+void BluetoothStack::ProcessCommand(State& state) {
   if (_switchServiceChar.written()) {
     char command = _switchServiceChar.value();
     if(DEBUG) {
@@ -121,8 +131,8 @@ void BluetoothStack::ProcessCommand(DataLogger& logger) {
         _shouldSendLog = true;
         break;
       case 'r':
-        logger.empty();
-        WriteCount(logger);
+        state.logger.empty();
+        WriteCount(state);
         break;
       default:
         if(DEBUG) {

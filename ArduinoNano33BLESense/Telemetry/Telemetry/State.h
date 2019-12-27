@@ -5,22 +5,24 @@
 #define State_h
 
 #include "Arduino.h"
-
-enum Vehicle_State {
-  Idle = 0,
-  LaunchIdle = 1,
-  Ascending = 2,
-  Descending = 3,
-  Landed = 4
-};
-
+#include "DataLogger.h"
+#include "Settings.h"
 
 class State
 {
   public:
     State();
+    void init();
     Vehicle_State vehicleState = Vehicle_State::Idle;
-
+    DataPoint currentDataPoint;
+    void createDataPoint(float pressure, float temperature, float acc_x, float acc_y, float acc_z);
+    DataLogger logger{};
+    
+  private:
+    void processDataPoint(DataPoint& point);
+    int _headIndex = 0;
+    float _lastPressures[RING_BUFFER_SIZE]; // RING_BUFFER_SIZE from settings
+    float _lastPressureDeltas[RING_BUFFER_SIZE];
 };
 
 #endif

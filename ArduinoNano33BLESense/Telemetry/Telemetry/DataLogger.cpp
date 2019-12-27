@@ -1,6 +1,7 @@
 #include "Arduino.h"
 #include "DataLogger.h"
 #include "Settings.h"
+#include "State.h"
 
 DataLogger::DataLogger() {
   

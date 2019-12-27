@@ -24,10 +24,9 @@ class BluetoothStack
 {
   public:
     BluetoothStack();
-    void DoLoop(DataLogger& logger, State& state);
+    void DoLoop(State& state);
     void Init();
   private:
-    //DataLogger _logger;
     long _previousMillis = 0;
     Debug_LED _led{23,24,22}; 
 
@@ -43,10 +42,13 @@ class BluetoothStack
 
     BLECharacteristic _itemCountServiceChar{"2AC0", BLERead, sizeof(int)};
     BLECharacteristic _stateServiceChar{"2AC1", BLERead, sizeof(int)};
+    
+    BLECharacteristic _currentDataPointServiceChar{"2AC2", BLERead | BLENotify | BLEIndicate, sizeof(DataPoint)};
 
-    void ProcessCommand(DataLogger& logger);
-    void WriteCount(DataLogger& logger);
-    void WriteState(int state);
+    void ProcessCommand(State& state);
+    void WriteCount(State& state);
+    void WriteState(State& state);
+    void WriteCurrentDataPoint(State& state);
 };
 
 #endif
