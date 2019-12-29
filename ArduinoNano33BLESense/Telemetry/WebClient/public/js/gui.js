@@ -24,7 +24,7 @@ export default class GUI {
       accyGraph: TD.graph({gridx: 10, gridy: 1, x:860,y:250,width:400,height:100,label:"Acc Y",data: []}),
       acczGraph: TD.graph({gridx: 10, gridy: 1, x:860,y:360,width:400,height:100,label:"Acc Z",data: []}),
       
-      modal: TD.modal({x:10,y:10,width:1000,height:600,label:"Click to connect",onchange:() => this.sendCommand("connect")}),
+      modal: TD.modal({x:10,y:10,width:1400,height:800,label:"Click to connect",onchange:() => this.sendCommand("connect")}),
     }
 
     for (var i in this.elements) {

@@ -59,18 +59,18 @@ export default class BLEConnector {
 
     let value = await this.itemCountCharacteristic.readValue();
     let count = value.getUint16(0);
-    this.gui.elements.itemCount.setValue(count);
+    this.gui.setValue("itemCount", count);
     value = await this.stateCharacteristic.readValue();
     let state = value.getUint16(0);
-    this.gui.elements.state.setValue(state);
+    this.gui.setValue("state", state);
 
     value = await this.vehicleStateCharacteristic.readValue();
     var parsedValue = this.parser.parse(value);
 
-    this.gui.elements.temperature.setValue(parsedValue.temperature);
+    this.gui.setValue("temperature", parsedValue.temperature);
     
-    this.gui.elements.pressure.setValue(parsedValue.pressure);
-    this.gui.elements.timestamp.setValue(parsedValue.timestamp);
+    this.gui.setValue("pressure", parsedValue.pressure);
+    this.gui.setValue("timestamp", parsedValue.timestamp);
     this.temperatureData.push(parsedValue.temperature);
     this.pressureData.push(parsedValue.pressure);
     this.accxData.push(parsedValue.accX);
@@ -79,7 +79,7 @@ export default class BLEConnector {
     this.gui.elements.temperatureGraph.setData(this.temperatureData);
     this.gui.elements.pressureGraph.setData(this.pressureData);
     
-    this.gui.elements.acceleration.setValue(`X:${Math.round(parsedValue.accX*100000) / 100000} Y:${Math.round(parsedValue.accY*100000) / 100000} Z:${Math.round(parsedValue.accZ*100000) / 100000}`)
+    this.gui.setValue("acceleration", `X:${Math.round(parsedValue.accX*100000) / 100000} Y:${Math.round(parsedValue.accY*100000) / 100000} Z:${Math.round(parsedValue.accZ*100000) / 100000}`)
     this.gui.elements.accxGraph.setData(this.accxData);
     this.gui.elements.accyGraph.setData(this.accyData);
     this.gui.elements.acczGraph.setData(this.acczData);
