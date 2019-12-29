@@ -76,13 +76,13 @@ export default class BLEConnector {
     this.accxData.push(parsedValue.accX);
     this.accyData.push(parsedValue.accY);
     this.acczData.push(parsedValue.accZ);
-    this.gui.elements.temperatureGraph.setData(this.temperatureData);
-    this.gui.elements.pressureGraph.setData(this.pressureData);
+    this.gui.setValue("temperatureGraph", this.temperatureData);
+    this.gui.setValue("pressureGraph", this.pressureData);
     
     this.gui.setValue("acceleration", `X:${Math.round(parsedValue.accX*100000) / 100000} Y:${Math.round(parsedValue.accY*100000) / 100000} Z:${Math.round(parsedValue.accZ*100000) / 100000}`)
-    this.gui.elements.accxGraph.setData(this.accxData);
-    this.gui.elements.accyGraph.setData(this.accyData);
-    this.gui.elements.acczGraph.setData(this.acczData);
+    this.gui.setValue("accxGraph", this.accxData);
+    this.gui.setValue("accyGraph", this.accyData);
+    this.gui.setValue("acczGraph", this.acczData);
   }
 
   async processCommand() {

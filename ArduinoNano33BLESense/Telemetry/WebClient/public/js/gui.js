@@ -33,7 +33,12 @@ export default class GUI {
   }
 
   setValue(name, value) {
-    this.elements[name].setValue(value);
+    let element = this.elements[name];
+    if(typeof element.setValue == "function") {
+      element.setValue(value);
+    } else {
+      element.setData(value);
+    }
   }
 
   sendCommand(command) {
