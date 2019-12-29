@@ -30,7 +30,7 @@ void BluetoothStack::Init() {
   _loggerService.addCharacteristic(_stateServiceChar);
   _loggerService.addCharacteristic(_currentDataPointServiceChar);
   
-  BLE.addService(_loggerService); // Add the battery service
+  BLE.addService(_loggerService);
   _switchServiceChar.setValue(0);
 
   
