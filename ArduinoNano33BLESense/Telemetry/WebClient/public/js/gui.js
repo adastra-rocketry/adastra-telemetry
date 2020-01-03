@@ -28,6 +28,7 @@ export default class GUI {
       accxGraph: TD.graph({gridx: 10, gridy: 1, x:860,y:140,width:400,height:100,label:"Acc X",data: []}),
       accyGraph: TD.graph({gridx: 10, gridy: 1, x:860,y:250,width:400,height:100,label:"Acc Y",data: []}),
       acczGraph: TD.graph({gridx: 10, gridy: 1, x:860,y:360,width:400,height:100,label:"Acc Z",data: []}),
+      pressureDeltaGraph: TD.graph({gridx: 10, gridy: 0.1, x:860,y:470,width:400,height:220,label:"PressureDelta",data: []}),
       
       modal: TD.modal({x:10,y:10,width:1400,height:800,label:"Click to connect",onchange:() => this.sendCommand("connect")}),
     }
