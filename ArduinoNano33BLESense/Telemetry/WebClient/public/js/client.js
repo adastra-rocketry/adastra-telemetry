@@ -12,6 +12,7 @@ export default class BLEConnector {
       this.commandToSend = null;
       this.temperatureData = [];
       this.pressureData = [];
+      this.altitudeData = [];
       this.accxData= [];
       this.accyData= [];
       this.acczData= [];
@@ -56,6 +57,7 @@ export default class BLEConnector {
     this.acczData = this.acczData.slice(-50);
     this.temperatureData = this.temperatureData.slice(-50);
     this.pressureData = this.pressureData.slice(-50);
+    this.altitudeData = this.altitudeData.slice(-50);
 
     let value = await this.itemCountCharacteristic.readValue();
     let count = value.getUint16(0);
@@ -70,14 +72,17 @@ export default class BLEConnector {
     this.gui.setValue("temperature", parsedValue.temperature);
     
     this.gui.setValue("pressure", parsedValue.pressure);
+    this.gui.setValue("altitude", parsedValue.altitude);
     this.gui.setValue("timestamp", parsedValue.timestamp);
     this.temperatureData.push(parsedValue.temperature);
     this.pressureData.push(parsedValue.pressure);
+    this.altitudeData.push(parsedValue.altitude);
     this.accxData.push(parsedValue.accX);
     this.accyData.push(parsedValue.accY);
     this.acczData.push(parsedValue.accZ);
     this.gui.setValue("temperatureGraph", this.temperatureData);
     this.gui.setValue("pressureGraph", this.pressureData);
+    this.gui.setValue("altitudeGraph", this.altitudeData);
     
     this.gui.setValue("acceleration", `X:${Math.round(parsedValue.accX*100000) / 100000} Y:${Math.round(parsedValue.accY*100000) / 100000} Z:${Math.round(parsedValue.accZ*100000) / 100000}`)
     this.gui.setValue("accxGraph", this.accxData);

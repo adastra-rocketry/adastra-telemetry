@@ -18,6 +18,8 @@ export default class GUI {
       temperatureGraph: TD.graph({gridx: 10, gridy: 10, x:450,y:140,width:400,height:220,label:"Temperature",data: []}),
       pressure : TD.gauge({x:240,y:370,width:200,height:220,label:"Pressure",value:0,min:100,max:110}),
       pressureGraph: TD.graph({gridx: 10, gridy: 10, x:450,y:370,width:400,height:220,label:"Pressure",data: []}),
+      altitude : TD.gauge({x:240,y:600,width:200,height:220,label:"Altitude",value:-50,min:-50,max:150}),
+      altitudeGraph: TD.graph({gridx: 10, gridy: 10, x:450,y:600,width:400,height:220,label:"Altitude",data: []}),
       
       acceleration: TD.value({x:860,y:70 ,width:400,height:60,label:"Acceleration",value:"0"}),
       accxGraph: TD.graph({gridx: 10, gridy: 1, x:860,y:140,width:400,height:100,label:"Acc X",data: []}),

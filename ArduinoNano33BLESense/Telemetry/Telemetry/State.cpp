@@ -34,7 +34,18 @@ void State::processDataPoint(DataPoint& point) {
     
     point.PressureDelta = pressureDelta;
     point.PressureDeltaMid = deltasMid;
+
+    point.Altitude = calculateAltitude(LaunchAltitude, PressureNN, point.Pressure * 10, point.Temperature);
     
     currentDataPoint = point;
+}
 
+float State::calculateAltitude(float launchAltitude, float launchPressure, float P, float T){
+  float P0 = readP0(launchAltitude, launchPressure);
+  return ( ( ( pow( ( P0 / P ), ( 1/5.257 ) ) ) - 1 ) * ( T + 273.15 ) ) / 0.0065;
+}
+
+float State::readP0(float myAltitude, float abs_Pressure) {
+  float p0 = abs_Pressure / pow((1.0 - ( myAltitude / 44330.0 )), 5.255);
+  return p0;
 }

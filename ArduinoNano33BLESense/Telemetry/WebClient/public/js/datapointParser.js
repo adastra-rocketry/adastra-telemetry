@@ -1,5 +1,3 @@
-import altitudeCalc from "./altitudeCalculator.js";
-
 export default class DataPointParser {
   constructor() {
 
@@ -18,9 +16,8 @@ export default class DataPointParser {
       accZ: value.getFloat32(24 + offset, true),
       pressureDelta: value.getFloat32(28 + offset, true),
       pressureDeltaMid: value.getFloat32(32 + offset, true),
+      altitude: value.getFloat32(36 + offset, true),
     };
-
-    result.altitude = altitudeCalc(result.pressure * 10, result.temperature);
 
     if(isDownload) {
       result["type"] = value.getUint16(0, true);
