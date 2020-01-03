@@ -10,6 +10,12 @@
 #include "Debug_LED.h"
 #include "State.h"
 
+struct Command {
+  char Type;
+  float Arg1;
+  float Arg2;
+};
+
 enum Transfer_Type {
   Data = 0,
   End = 1
@@ -35,10 +41,9 @@ class BluetoothStack
     TransferObject _transferObject;
     
     BLEService _loggerService{"181C"};
-    // BLE Battery Level Characteristic
     BLECharacteristic _loggerServiceChar{"2A3D",  // standard 16-bit characteristic UUID
         BLERead | BLENotify | BLEIndicate, sizeof(TransferObject)};
-    BLEUnsignedCharCharacteristic _switchServiceChar{"19B10001-E8F2-537E-4F6C-D104768A1214", BLERead | BLEWrite};
+    BLECharacteristic _commandServiceChar{"19B10001-E8F2-537E-4F6C-D104768A1214", BLERead | BLEWrite, sizeof(Command)};
 
     BLECharacteristic _itemCountServiceChar{"2AC0", BLERead, sizeof(int)};
     BLECharacteristic _stateServiceChar{"2AC1", BLERead, sizeof(int)};

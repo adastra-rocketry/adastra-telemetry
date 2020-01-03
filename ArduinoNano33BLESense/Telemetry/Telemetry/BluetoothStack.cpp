@@ -25,13 +25,13 @@ void BluetoothStack::Init() {
   BLE.setLocalName("AdAstra Telemetry");
   BLE.setAdvertisedService(_loggerService); // add the service UUID
   _loggerService.addCharacteristic(_loggerServiceChar);
-  _loggerService.addCharacteristic(_switchServiceChar);
+  _loggerService.addCharacteristic(_commandServiceChar);
   _loggerService.addCharacteristic(_itemCountServiceChar);
   _loggerService.addCharacteristic(_stateServiceChar);
   _loggerService.addCharacteristic(_currentDataPointServiceChar);
   
   BLE.addService(_loggerService);
-  _switchServiceChar.setValue(0);
+  _commandServiceChar.setValue(0);
 
   
   /* Start advertising BLE.  It will start continuously transmitting BLE
@@ -46,10 +46,6 @@ void BluetoothStack::Init() {
 void BluetoothStack::DoLoop(State& state) {
   BLEDevice central = BLE.central();
   if (central) {
-    if(DEBUG) Serial.print("Connected to central: ");
-    // print the central's BT address:
-    if(DEBUG) Serial.println(central.address());
-
     WriteCount(state);
     WriteState(state);
     WriteCurrentDataPoint(state);
@@ -85,11 +81,6 @@ void BluetoothStack::DoLoop(State& state) {
       }
     }
     _led.setColor(false, true, false);
-    
-    if(DEBUG) {
-      Serial.print("Disconnected from central: ");
-      Serial.println(central.address());   
-    }
   }
 }
 
@@ -119,14 +110,23 @@ void BluetoothStack::WriteCurrentDataPoint(State& stateObj) {
 }
 
 void BluetoothStack::ProcessCommand(State& state) {
-  if (_switchServiceChar.written()) {
-    char command = _switchServiceChar.value();
+  if (_commandServiceChar.written()) {
+    Command command;
+    const uint8_t* b;
+    b = _commandServiceChar.value();
+    memcpy(&command, b, sizeof(command));
+    
     if(DEBUG) {
       Serial.print("Got new command:");
-      Serial.println(command);
+      Serial.print(command.Type);
+      Serial.println();
+      Serial.print(command.Arg1, 3);
+      Serial.println();
+      Serial.print(command.Arg2, 3);
+      Serial.println();
     }
 
-    switch(command) {
+    switch(command.Type) {
       case 'd':
         state.vehicleState = Vehicle_State::Landed;
         WriteState(state);
@@ -140,10 +140,14 @@ void BluetoothStack::ProcessCommand(State& state) {
         state.vehicleState = Vehicle_State::LaunchIdle;
         WriteState(state);
         break;
+      case 's':
+        state.LaunchAltitude = command.Arg1;
+        state.PressureNN = command.Arg2;
+        break;
       default:
         if(DEBUG) {
           Serial.print("Unknown command: ");
-          Serial.println(command);
+          Serial.println(command.Type);
         }
     }
     

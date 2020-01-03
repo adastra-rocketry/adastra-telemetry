@@ -43,10 +43,21 @@ export default class BLEConnector {
     clearInterval(this.updateInterval)
   }
 
-  async sendMachineCommand(command) {
-    var enc = new TextEncoder();
-    let buffer = enc.encode(command);
-    await this.commandCharacteristic.writeValue(buffer);
+  async sendMachineCommand(commandchar, arg1, arg2) {
+    var buffer = new ArrayBuffer(12);
+    var dataView = new DataView(buffer);
+
+    arg1 = arg1 || 0.0;
+    arg2 = arg2 || 0.0;
+    let enc = new TextEncoder();
+    let commandArray = enc.encode(commandchar);
+
+    dataView.setUint8(0, commandArray[0]);
+    dataView.setFloat32(4, arg1, true);
+    dataView.setFloat32(8, arg2, true);
+
+    let command = new Uint8Array(buffer);
+    await this.commandCharacteristic.writeValue(command);
   }
 
   async readValues() {
@@ -105,6 +116,9 @@ export default class BLEConnector {
       }
       if(this.commandToSend == "launchidle") {
         await this.sendMachineCommand('l');
+      }
+      if(this.commandToSend == "launchparameter") {
+        await this.sendMachineCommand('s', this.gui.getValue("launchAltitude"), this.gui.getValue("launchPressure"));
       }
       this.commandToSend = null;
       return true;
