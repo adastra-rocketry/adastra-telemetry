@@ -5,6 +5,7 @@
 #define Sensors_h
 
 #include "Arduino.h"
+#include "Sound.h"
 
 class Sensors
 {
@@ -18,6 +19,7 @@ class Sensors
     void initBarometer();
     void initAccelerometer();
     void initTemperatureSensor();
+    Sound sound{};
 };
 
 #endif

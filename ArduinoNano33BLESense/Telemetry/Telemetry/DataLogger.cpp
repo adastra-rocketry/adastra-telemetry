@@ -13,7 +13,7 @@ void DataLogger::saveValue(DataPoint& newValue) {
 }
 
 bool DataLogger::hasSpaceLeft() {
-  return _counter < 1024;
+  return _counter < STORAGE_SIZE;
 }
 
 bool DataLogger::hasNextEntry() {

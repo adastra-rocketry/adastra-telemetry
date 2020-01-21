@@ -5,6 +5,8 @@
 #define DataLogger_h
 
 #include "Arduino.h"
+#include "Settings.h"
+
 
 enum Vehicle_State {
   Idle = 0,
@@ -40,7 +42,7 @@ class DataLogger
     bool hasNextEntry();
     int getCounter();
   private:
-    DataPoint _storage[1024];
+    DataPoint _storage[STORAGE_SIZE];
     int _counter = 0;
     int _positionCounter = 0;
 };
