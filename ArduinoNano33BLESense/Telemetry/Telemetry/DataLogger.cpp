@@ -24,29 +24,11 @@ void DataLogger::init() {
 }
 
 void DataLogger::saveValue(DataPoint& newValue) {
-
-  _storage[_counter] = newValue;
   _counter++;
 
   if(SDavailable) {
     createCsvLine(newValue);
   }
-}
-
-bool DataLogger::hasSpaceLeft() {
-  return _counter < STORAGE_SIZE;
-}
-
-bool DataLogger::hasNextEntry() {
-  bool isAtEnd = _positionCounter >= _counter;
-  if(isAtEnd) _positionCounter = 0;
-  return (!isAtEnd);
-}
-
-DataPoint DataLogger::getNextEntry() {
-  DataPoint point = _storage[_positionCounter];
-  _positionCounter++;
-  return point;
 }
 
 int DataLogger::getCounter() {
@@ -99,5 +81,4 @@ void DataLogger::empty() {
     createCsvHeadings();
   }
   _counter = 0;
-  _positionCounter = 0;
 }

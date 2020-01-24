@@ -1,13 +1,11 @@
 
 import DataPointParser from "./datapointParser.js";
-import Download from "./download.js";
 
 export default class BLEConnector {
 
   constructor(gui) {
       this.gui = gui;
       this.parser = new DataPointParser();
-      this.downloader = new Download();
 
       this.commandToSend = null;
       this.temperatureData = [];
@@ -23,7 +21,6 @@ export default class BLEConnector {
       this.stateCharacteristic = null;
       this.commandCharacteristic = null;
       this.vehicleStateCharacteric = null;
-      this.downloadCharacteristic = null;
 
       this.updateInterval;
       this.gui.commandListeners.push(this.processGUICommand.bind(this));
@@ -115,12 +112,6 @@ export default class BLEConnector {
           await this.sendMachineCommand('r');
         }
       }
-      if(this.commandToSend == "download") {
-        this.downloader.reset();
-        this.deregisterMachineUpdates();
-        await this.downloadCharacteristic.startNotifications();
-        await this.sendMachineCommand('d');
-      }
       if(this.commandToSend == "launchidle") {
         await this.sendMachineCommand('l');
       }
@@ -131,19 +122,6 @@ export default class BLEConnector {
       return true;
     }
     return false;
-  }
-
-  handleDownloadNotifications(event) {
-    let value = event.target.value;
-    let parsedValue = this.parser.parse(value, true);
-
-    this.downloader.addNewLine(parsedValue);
-    console.log(parsedValue);
-
-    if(parsedValue.type == 1) {
-      this.downloader.download();
-      this.registerMachineUpdates();
-    }
   }
 
   async connectDevice() {
@@ -157,8 +135,6 @@ export default class BLEConnector {
       this.stateCharacteristic = await service.getCharacteristic(0x2ac1);
       this.commandCharacteristic = await service.getCharacteristic('19b10001-e8f2-537e-4f6c-d104768a1214');
       this.vehicleStateCharacteristic = await service.getCharacteristic(0x2ac2);
-      this.downloadCharacteristic = await service.getCharacteristic(0x2a3d);
-      this.downloadCharacteristic.addEventListener('characteristicvaluechanged', this.handleDownloadNotifications.bind(this));
 
       this.gui.elements.modal.remove();
 

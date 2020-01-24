@@ -16,16 +16,6 @@ struct Command {
   float Arg2;
 };
 
-enum Transfer_Type {
-  Data = 0,
-  End = 1
-};
-
-struct TransferObject {
-  Transfer_Type Type;
-  DataPoint Data;
-};
-
 class BluetoothStack
 {
   public:
@@ -33,16 +23,9 @@ class BluetoothStack
     void DoLoop(State& state);
     void Init();
   private:
-    long _previousMillis = 0;
-    Debug_LED _led{23,24,22}; 
-
-    bool _shouldSendLog = false;
-    bool _transferInProgress = false;
-    TransferObject _transferObject;
+    Debug_LED _led{23,24,22};
     
     BLEService _loggerService{"181C"};
-    BLECharacteristic _loggerServiceChar{"2A3D",  // standard 16-bit characteristic UUID
-        BLERead | BLENotify | BLEIndicate, sizeof(TransferObject)};
     BLECharacteristic _commandServiceChar{"19B10001-E8F2-537E-4F6C-D104768A1214", BLERead | BLEWrite, sizeof(Command)};
 
     BLECharacteristic _itemCountServiceChar{"2AC0", BLERead, sizeof(int)};

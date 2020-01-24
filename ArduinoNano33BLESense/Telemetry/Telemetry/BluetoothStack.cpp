@@ -24,7 +24,6 @@ void BluetoothStack::Init() {
   */
   BLE.setLocalName("AdAstra Telemetry");
   BLE.setAdvertisedService(_loggerService); // add the service UUID
-  _loggerService.addCharacteristic(_loggerServiceChar);
   _loggerService.addCharacteristic(_commandServiceChar);
   _loggerService.addCharacteristic(_itemCountServiceChar);
   _loggerService.addCharacteristic(_stateServiceChar);
@@ -53,32 +52,6 @@ void BluetoothStack::DoLoop(State& state) {
     if (central.connected()) {
       ProcessCommand(state);
       _led.setColor(false, false, true);
-      bool hasNextEntry = state.logger.hasNextEntry();
-      if(_shouldSendLog && hasNextEntry) {
-        _transferInProgress = true;
-        long currentMillis = millis();
-          
-        if (currentMillis - _previousMillis >= DOWNLOAD_SPEED) {
-          DataPoint point = state.logger.getNextEntry();
-          _transferObject.Data = point;
-          _transferObject.Type = Transfer_Type::Data; 
-          unsigned char b[sizeof(_transferObject)];
-          memcpy(b, &_transferObject, sizeof(_transferObject));
-          _loggerServiceChar.writeValue(b, sizeof(b));
-          _previousMillis = currentMillis;
-        }
-      } else {
-        if(_transferInProgress) {
-          _transferObject.Type = Transfer_Type::End; 
-          unsigned char b[sizeof(_transferObject)];
-          memcpy(b, &_transferObject, sizeof(_transferObject));
-
-          _loggerServiceChar.writeValue(b, sizeof(b));
-          _transferInProgress = false;
-        }
-
-        _shouldSendLog = false;
-      }
     }
     _led.setColor(false, true, false);
   }
@@ -130,7 +103,6 @@ void BluetoothStack::ProcessCommand(State& state) {
       case 'd':
         state.vehicleState = Vehicle_State::Landed;
         WriteState(state);
-        _shouldSendLog = true;
         break;
       case 'r':
         state.logger.empty();

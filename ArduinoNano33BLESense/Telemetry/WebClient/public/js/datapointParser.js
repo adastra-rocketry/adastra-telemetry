@@ -3,8 +3,8 @@ export default class DataPointParser {
 
   }
 
-  parse(value, isDownload) {
-    let offset = isDownload ? 4 : 0;
+  parse(value) {
+    let offset = 0;
 
     let result = {
       state: value.getUint16(0 + offset, true),
@@ -18,10 +18,6 @@ export default class DataPointParser {
       pressureDeltaMid: value.getFloat32(32 + offset, true),
       altitude: value.getFloat32(36 + offset, true),
     };
-
-    if(isDownload) {
-      result["type"] = value.getUint16(0, true);
-    }
 
     return result;
   }

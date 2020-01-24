@@ -14,7 +14,7 @@ void State::init() {
 void State::createDataPoint(float pressure, float temperature, float acc_x, float acc_y, float acc_z) {
   DataPoint newItem = {vehicleState, millis(), pressure, temperature, acc_x, acc_y, acc_z};
   processDataPoint(newItem);
-  if(vehicleState != Vehicle_State::Idle && vehicleState != Vehicle_State::Landed && logger.hasSpaceLeft()) {
+  if(vehicleState != Vehicle_State::Idle && vehicleState != Vehicle_State::Landed) {
     logger.saveValue(newItem);
   }
 }
