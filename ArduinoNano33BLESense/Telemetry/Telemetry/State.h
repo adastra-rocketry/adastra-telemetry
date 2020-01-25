@@ -7,6 +7,7 @@
 #include "Arduino.h"
 #include "DataLogger.h"
 #include "Settings.h"
+#include "Sound.h"
 
 class State
 {
@@ -20,6 +21,7 @@ class State
 
     float LaunchAltitude = 145.0f;
     float PressureNN = 1027.6f;
+    Sound sound{};
     
   private:
     void processDataPoint(DataPoint& point);

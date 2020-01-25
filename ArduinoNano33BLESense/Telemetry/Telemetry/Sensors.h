@@ -6,12 +6,13 @@
 
 #include "Arduino.h"
 #include "Sound.h"
+#include "State.h"
 
 class Sensors
 {
   public:
     Sensors();
-    void init();
+    void init(State& initState);
     float readPressure();
     float readTemperature();
     void readAcceleration(float &acc_x, float &acc_y, float &acc_z);
@@ -19,7 +20,7 @@ class Sensors
     void initBarometer();
     void initAccelerometer();
     void initTemperatureSensor();
-    Sound sound{};
+    State state;
 };
 
 #endif

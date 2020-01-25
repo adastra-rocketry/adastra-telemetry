@@ -40,7 +40,7 @@ void setup() {
     Serial.println("AdAstra Telemetry");
   }
   state.init();
-  sensors.init();
+  sensors.init(state);
   delay(1000);
   ble.Init();
   

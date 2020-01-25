@@ -9,11 +9,12 @@ Sensors::Sensors() {
   
 }
 
-void Sensors::init() {
+void Sensors::init(State& initState) {
+  state = initState;
   initAccelerometer();
   initTemperatureSensor();
   initBarometer();
-  sound.stopSound();
+  state.sound.stopSound();
 }
 
 void Sensors::readAcceleration(float &acc_x, float &acc_y, float &acc_z ) {
@@ -32,7 +33,7 @@ float Sensors::readTemperature() {
 }
 
 void Sensors::initBarometer() {
-  sound.playSound(262, 1000);
+  state.sound.playSound(262, 1000);
   delay(500);
   if (!BARO.begin()) {
     if(DEBUG) Serial.println("Failed to initialize pressure sensor!");
@@ -43,7 +44,7 @@ void Sensors::initBarometer() {
 
 
 void Sensors::initAccelerometer() {
-  sound.playSound(131, 1000);
+  state.sound.playSound(131, 1000);
   delay(500);
   if (!IMU.begin()) {
     if(DEBUG) Serial.println("Failed to initialize IMU!");
@@ -53,7 +54,7 @@ void Sensors::initAccelerometer() {
 }
 
 void Sensors::initTemperatureSensor() {
-  sound.playSound(196, 1000);
+  state.sound.playSound(196, 1000);
   delay(1000);
   if (!HTS.begin()) {
     if(DEBUG) Serial.println("Failed to init temperature sensor!");
