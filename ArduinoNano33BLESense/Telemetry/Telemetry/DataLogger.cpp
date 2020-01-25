@@ -11,11 +11,12 @@ DataLogger::DataLogger() {
 
 }
 
-void DataLogger::init() {
+void DataLogger::init(Sound& sound) {
   if (!SD.begin(SD_CARD_PIN)) {
     Serial.println("Card failed, or not present");
     // don't do anything more:
     SDavailable = false;
+    sound.playError(3);
   }
   if(SDavailable) {
     createNewFile();

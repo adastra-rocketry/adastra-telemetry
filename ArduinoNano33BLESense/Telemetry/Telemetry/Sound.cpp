@@ -22,3 +22,26 @@ void Sound::stopSound() {
     noTone(EXTERNAL_BUZZER_PIN);
   }
 }
+
+void Sound::playError(unsigned char code){
+  delay(500);
+  if(SOUND) {
+    int what_bit_i_am_testing = 0;
+    
+    while (what_bit_i_am_testing < 8) {
+      if (code & 0x01) {
+         playSound(300, 100);
+      }
+      else {
+         playSound(400, 100);
+         
+      }
+      
+      delay(180);
+    
+      what_bit_i_am_testing++;
+      code = code >> 1;
+    }
+    delay(1000);
+  }
+}

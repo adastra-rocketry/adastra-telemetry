@@ -9,6 +9,7 @@ class Sound
     Sound();
     void playSound(float freq, int t);
     void stopSound();
+    void playError(unsigned char code);
 };
 
 #endif

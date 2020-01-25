@@ -8,7 +8,7 @@ State::State() {
 }
 
 void State::init() {
-  logger.init();
+  logger.init(sound);
 }
 
 void State::createDataPoint(float pressure, float temperature, float acc_x, float acc_y, float acc_z) {

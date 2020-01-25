@@ -7,6 +7,7 @@
 #include "Arduino.h"
 #include "Settings.h"
 #include <SD.h>
+#include "Sound.h"
 
 
 enum Vehicle_State {
@@ -36,7 +37,7 @@ class DataLogger
 {
   public:
     DataLogger();
-    void init();
+    void init(Sound& sound);
     void saveValue(DataPoint& newValue);
     void empty();
     int getCounter();
