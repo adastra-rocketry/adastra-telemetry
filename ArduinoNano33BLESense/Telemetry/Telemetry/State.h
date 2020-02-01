@@ -8,6 +8,8 @@
 #include "DataLogger.h"
 #include "Settings.h"
 #include "Sound.h"
+#include <SimpleKalmanFilter.h>
+
 
 class State
 {
@@ -25,11 +27,18 @@ class State
     
   private:
     void processDataPoint(DataPoint& point);
-    int _headIndex = 0;
-    float _lastPressures[RING_BUFFER_SIZE]; // RING_BUFFER_SIZE from settings
-    float _lastPressureDeltas[RING_BUFFER_SIZE];
+    float lastPressure;
     float calculateAltitude(float launchAltitude, float launchPressure, float P, float T);
     float readP0(float myAltitude, float abs_Pressure);
+
+  /*SimpleKalmanFilter(e_mea, e_est, q);
+    e_mea: Measurement Uncertainty 
+    e_est: Estimation Uncertainty 
+    q: Process Noise */
+    SimpleKalmanFilter pressureKalmanFilter{1, 1, 1};
+    SimpleKalmanFilter temperatureKalmanFilter{1, 1, 1};
+    SimpleKalmanFilter pressureDeltaKalmanFilter{1, 1, 1};
+    SimpleKalmanFilter altitudeKalmanFilter{1, 1, 1};
 };
 
 #endif

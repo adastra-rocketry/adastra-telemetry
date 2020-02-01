@@ -28,9 +28,13 @@ struct DataPoint {
   float Acc_Z;
   
   float PressureDelta;
-  float PressureDeltaMid;
+  float KalmanPressureDelta;
 
   float Altitude;
+  
+  float KalmanPressure;
+  float KalmanAltitude;
+  float KalmanTemperature;
 };
 
 class DataLogger

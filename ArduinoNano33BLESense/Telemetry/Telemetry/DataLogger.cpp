@@ -47,7 +47,7 @@ void DataLogger::createNewFile() {
 }
 
 void DataLogger::createCsvHeadings() {
-  String headings = "state;timestamp;pressure;temperature;accX;accY;accZ;pressureDelta;pressureDeltaMid;altitude";
+  String headings = "state;timestamp;pressure;temperature;accX;accY;accZ;pressureDelta;pressureDeltaMid;altitude;KalmanPressure;KalmanAltitude";
   if (dataFile) {
     dataFile.println(headings);
     dataFile.flush();
@@ -56,7 +56,7 @@ void DataLogger::createCsvHeadings() {
 
 void DataLogger::createCsvLine(DataPoint& dataPoint) {
   char dataString [400];
-  snprintf ( dataString, 400, "%u,%lu,%f,%f,%f,%f,%f,%f,%f,%f", 
+  snprintf ( dataString, 400, "%u;%lu;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f;%f", 
     dataPoint.State, 
     dataPoint.Timestamp, 
     dataPoint.Pressure, 
@@ -65,8 +65,11 @@ void DataLogger::createCsvLine(DataPoint& dataPoint) {
     dataPoint.Acc_Y, 
     dataPoint.Acc_Z,
     dataPoint.PressureDelta,
-    dataPoint.PressureDeltaMid,
-    dataPoint.Altitude
+    dataPoint.KalmanPressureDelta,
+    dataPoint.Altitude,
+    dataPoint.KalmanPressure,
+    dataPoint.KalmanAltitude,
+    dataPoint.KalmanTemperature
   );
   if (dataFile) {
     dataFile.println(dataString);

@@ -12,6 +12,5 @@
 #define SD_CARD_PIN 5
 
 #define SAVE_INTERVAL 400
-#define RING_BUFFER_SIZE 5 // amount of preassure data to take into consideration to determine state transitions
 
 #endif

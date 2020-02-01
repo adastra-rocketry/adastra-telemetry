@@ -11,8 +11,11 @@ export default class BLEConnector {
       this.temperatureData = [];
       this.pressureData = [];
       this.pressureDeltaData = [];
-      this.pressureDeltaMidData = [];
+      this.kalmanPressureDeltaData = [];
       this.altitudeData = [];
+      this.kalmanPressureData = [];
+      this.kalmanAltitudeData = [];
+      this.kalmanTemperatureData = [];
       this.accxData= [];
       this.accyData= [];
       this.acczData= [];
@@ -67,9 +70,12 @@ export default class BLEConnector {
     this.acczData = this.acczData.slice(-50);
     this.temperatureData = this.temperatureData.slice(-50);
     this.pressureData = this.pressureData.slice(-50);
+    this.kalmanPressureData = this.kalmanPressureData.slice(-50);
+    this.kalmanTemperatureData = this.kalmanTemperatureData.slice(-50);
     this.pressureDeltaData = this.pressureDeltaData.slice(-50);
-    this.pressureDeltaMidData = this.pressureDeltaMidData.slice(-50);
+    this.kalmanPressureDeltaData = this.kalmanPressureDeltaData.slice(-50);
     this.altitudeData = this.altitudeData.slice(-50);
+    this.kalmanAltitudeData = this.kalmanAltitudeData.slice(-50);
 
     let value = await this.itemCountCharacteristic.readValue();
     let count = value.getUint16(0);
@@ -89,20 +95,23 @@ export default class BLEConnector {
     this.temperatureData.push(parsedValue.temperature);
     this.pressureData.push(parsedValue.pressure);
     this.pressureDeltaData.push(parsedValue.pressureDelta);
-    this.pressureDeltaMidData.push(parsedValue.pressureDeltaMid);
+    this.kalmanPressureDeltaData.push(parsedValue.kalmanPressureDelta);
+    this.kalmanAltitudeData.push(parsedValue.kalmanAltitude);
+    this.kalmanPressureData.push(parsedValue.kalmanPressure);
+    this.kalmanTemperatureData.push(parsedValue.kalmanTemperature);
     this.altitudeData.push(parsedValue.altitude);
     this.accxData.push(parsedValue.accX);
     this.accyData.push(parsedValue.accY);
     this.acczData.push(parsedValue.accZ);
-    this.gui.setValue("temperatureGraph", this.temperatureData);
-    this.gui.setValue("pressureGraph", this.pressureData);
-    this.gui.setValue("altitudeGraph", this.altitudeData);
+    this.gui.setValue("temperatureGraph", [this.temperatureData, this.kalmanTemperatureData]);
+    this.gui.setValue("pressureGraph", [this.pressureData, this.kalmanPressureData]);
+    this.gui.setValue("altitudeGraph", [this.altitudeData, this.kalmanAltitudeData]);
     
     this.gui.setValue("acceleration", `X:${Math.round(parsedValue.accX*100000) / 100000} Y:${Math.round(parsedValue.accY*100000) / 100000} Z:${Math.round(parsedValue.accZ*100000) / 100000}`)
     this.gui.setValue("accxGraph", this.accxData);
     this.gui.setValue("accyGraph", this.accyData);
     this.gui.setValue("acczGraph", this.acczData);
-    this.gui.setValue("pressureDeltaGraph", [this.pressureDeltaData, this.pressureDeltaMidData]);
+    this.gui.setValue("pressureDeltaGraph", [this.pressureDeltaData, this.kalmanPressureDeltaData]);
   }
 
   async processCommand() {

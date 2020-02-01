@@ -10,7 +10,7 @@ export default class GUI {
       launchIdle :TD.button({x:10,y:370,width:200,height:80,label:"Go to LaunchIdle",value:0,name:"button",onchange:() => this.sendCommand('launchidle')}),
       resetButton :TD.button({x:10,y:450,width:200,height:80,label:"Reset",value:0,name:"button",onchange:() => this.sendCommand('reset')}),
       launchAltitude: TD.value({x:10, y: 620, height: 50, width: 200, label: "Launch Altitude (m over NN)", step: 5, value: 145, min: 0, max: 300}),
-      launchPressure: TD.value({x:10, y: 670, height: 50, width: 200, label: "Launch Pressure (hpa)", step: 1, value: 1003.25, min: 1000, max: 1050}),
+      launchPressure: TD.value({x:10, y: 670, height: 50, width: 200, label: "Launch Pressure (hpa)", step: 1, value: 1003.25, min: 990, max: 1050}),
       setLaunchParameter :TD.button({x:10,y:720,width:200,height:80,label:"Set Launch Parameter",value:0,name:"button",onchange:() => this.sendCommand('launchparameter')}),
 
       

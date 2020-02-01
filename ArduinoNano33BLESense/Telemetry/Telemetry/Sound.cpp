@@ -7,10 +7,10 @@ Sound::Sound() {
 
 void Sound::playSound(float freq, int t) {
   if(SOUND) {
-    tone(BUZZER_PIN, freq, t * 1000);
+    tone(BUZZER_PIN, freq, t);
   }
   if(EXTERNAL_SOUND) {
-    tone(EXTERNAL_BUZZER_PIN, freq, t * 1000);
+    tone(EXTERNAL_BUZZER_PIN, freq, t);
   }
 }
 
