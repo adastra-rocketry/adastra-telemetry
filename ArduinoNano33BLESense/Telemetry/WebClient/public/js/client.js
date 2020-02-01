@@ -87,10 +87,10 @@ export default class BLEConnector {
     value = await this.vehicleStateCharacteristic.readValue();
     var parsedValue = this.parser.parse(value);
 
-    this.gui.setValue("temperature", parsedValue.temperature);
+    this.gui.setValue("temperature", parsedValue.kalmanTemperature);
     
-    this.gui.setValue("pressure", parsedValue.pressure);
-    this.gui.setValue("altitude", parsedValue.altitude);
+    this.gui.setValue("pressure", parsedValue.kalmanPressure);
+    this.gui.setValue("altitude", parsedValue.kalmanAltitude);
     this.gui.setValue("timestamp", parsedValue.timestamp);
     this.temperatureData.push(parsedValue.temperature);
     this.pressureData.push(parsedValue.pressure);
