@@ -12,12 +12,26 @@ void State::init() {
   logger.init(sound);
 }
 
-void State::createDataPoint(float pressure, float temperature, float acc_x, float acc_y, float acc_z) {
-  DataPoint newItem = {vehicleState, millis(), pressure, temperature, acc_x, acc_y, acc_z};
+void State::createDataPoint(float pressure, float temperature, float acc_x, float acc_y, float acc_z, float g_x, float g_y, float g_z) {
+  DataPoint newItem = {vehicleState, millis(), pressure, temperature, acc_x, acc_y, acc_z, g_x, g_y, g_z};
   processDataPoint(newItem);
   if(vehicleState != Vehicle_State::Idle && vehicleState != Vehicle_State::Landed) {
     logger.saveValue(newItem);
   }
+  currentDataPoint = newItem;
+
+}
+
+void State::updateFlightState() {
+  if(vehicleState == Vehicle_State::LaunchIdle && currentDataPoint.G_X > 30) {
+    vehicleState = Vehicle_State::Ascending;
+    sound.playSound(400, 500);
+  }
+  if(vehicleState == Vehicle_State::Ascending && currentDataPoint.KalmanAltitude < heighestAltitude - 2) {
+    vehicleState = Vehicle_State::Descending;
+    sound.playSound(400, 500);
+  }
+  
 }
 
 void State::processDataPoint(DataPoint& point) {
@@ -30,9 +44,7 @@ void State::processDataPoint(DataPoint& point) {
 
     point.Altitude = calculateAltitude(LaunchAltitude, PressureNN, point.Pressure * 10, point.Temperature);
     point.KalmanAltitude = altitudeKalmanFilter.updateEstimate(point.Altitude);
-    
-    currentDataPoint = point;
-
+    if(point.KalmanAltitude > heighestAltitude) heighestAltitude = point.KalmanAltitude;
     lastPressure = point.Pressure;
 }
 

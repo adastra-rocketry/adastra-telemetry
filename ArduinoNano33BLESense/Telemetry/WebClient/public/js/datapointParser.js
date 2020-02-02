@@ -14,13 +14,18 @@ export default class DataPointParser {
       accX: value.getFloat32(16 + offset, true),
       accY: value.getFloat32(20 + offset, true),
       accZ: value.getFloat32(24 + offset, true),
-      pressureDelta: value.getFloat32(28 + offset, true),
-      kalmanPressureDelta: value.getFloat32(32 + offset, true),
-      altitude: value.getFloat32(36 + offset, true),
 
-      kalmanPressure: value.getFloat32(40 + offset, true),
-      kalmanAltitude: value.getFloat32(44 + offset, true),
-      kalmanTemperature: value.getFloat32(48 + offset, true)
+      gX: value.getFloat32(28 + offset, true),
+      gY: value.getFloat32(32 + offset, true),
+      gZ: value.getFloat32(36 + offset, true),
+
+      pressureDelta: value.getFloat32(40 + offset, true),
+      kalmanPressureDelta: value.getFloat32(44 + offset, true),
+      altitude: value.getFloat32(48 + offset, true),
+
+      kalmanPressure: value.getFloat32(52 + offset, true),
+      kalmanAltitude: value.getFloat32(56 + offset, true),
+      kalmanTemperature: value.getFloat32(60 + offset, true)
 
     };
 

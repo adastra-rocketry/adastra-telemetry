@@ -16,9 +16,10 @@ class Sensors
     float readPressure();
     float readTemperature();
     void readAcceleration(float &acc_x, float &acc_y, float &acc_z);
+    void readGyroscope(float &g_x, float &g_y, float &g_z);
   private:
     void initBarometer();
-    void initAccelerometer();
+    void initIMU();
     void initTemperatureSensor();
     State state;
 };

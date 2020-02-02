@@ -19,14 +19,10 @@ void readSensors() {
   float pressure = sensors.readPressure();
   float acc_x, acc_y, acc_z;
   sensors.readAcceleration(acc_x, acc_y, acc_z);
+  float g_x, g_y, g_z;
+  sensors.readGyroscope(g_x, g_y, g_z);
 
-  if(DEBUG) {
-    Serial.print("Temperature: ");
-    Serial.print(temperature);
-    Serial.println("°C");
-  }
-
-  state.createDataPoint(pressure, temperature, acc_x, acc_y, acc_z);
+  state.createDataPoint(pressure, temperature, acc_x, acc_y, acc_z, g_x, g_y, g_z);
 }
 
 
@@ -55,6 +51,7 @@ void loop() {
   // if 200ms have passed
   if(currentMillis - previousMillis >= SAVE_INTERVAL) {
     readSensors();
+    state.updateFlightState();
     previousMillis = currentMillis;
   }
 }

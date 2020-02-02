@@ -26,6 +26,10 @@ struct DataPoint {
   float Acc_X;
   float Acc_Y;
   float Acc_Z;
+
+  float G_X;
+  float G_Y;
+  float G_Z;
   
   float PressureDelta;
   float KalmanPressureDelta;

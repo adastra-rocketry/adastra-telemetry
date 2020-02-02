@@ -23,11 +23,17 @@ export default class GUI {
       altitude : TD.gauge({x:240,y:600,width:200,height:220,label:"Altitude",value:-10,min:-10,max:300}),
       altitudeGraph: TD.graph({gridx: 10, gridy: 10, x:450,y:600,width:400,height:220,label:"Altitude",data: []}),
       
+      pressureDelta : TD.gauge({x:240,y:830,width:200,height:220,label:"PressureDelta",value:0,min:-5,max:5}),
+      pressureDeltaGraph: TD.graph({gridx: 10, gridy: 0.1, x:450,y:830,width:400,height:220,label:"PressureDelta",data: []}),
+      
       acceleration: TD.value({x:860,y:70 ,width:400,height:60,label:"Acceleration",value:"0"}),
       accxGraph: TD.graph({gridx: 10, gridy: 1, x:860,y:140,width:400,height:100,label:"Acc X",data: []}),
       accyGraph: TD.graph({gridx: 10, gridy: 1, x:860,y:250,width:400,height:100,label:"Acc Y",data: []}),
       acczGraph: TD.graph({gridx: 10, gridy: 1, x:860,y:360,width:400,height:100,label:"Acc Z",data: []}),
-      pressureDeltaGraph: TD.graph({gridx: 10, gridy: 0.1, x:860,y:470,width:400,height:220,label:"PressureDelta",data: []}),
+
+      gxGraph: TD.graph({gridx: 10, gridy: 25, x:860,y:470,width:400,height:100,label:"Gyro X",data: []}),
+      gyGraph: TD.graph({gridx: 10, gridy: 25, x:860,y:580,width:400,height:100,label:"Gyro Y",data: []}),
+      gzGraph: TD.graph({gridx: 10, gridy: 25, x:860,y:690,width:400,height:100,label:"Gyro Z",data: []}),
       
       modal: TD.modal({x:10,y:10,width:1400,height:800,label:"Click to connect",onchange:() => this.sendCommand("connect")}),
     }

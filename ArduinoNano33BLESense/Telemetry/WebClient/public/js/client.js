@@ -19,6 +19,9 @@ export default class BLEConnector {
       this.accxData= [];
       this.accyData= [];
       this.acczData= [];
+      this.gxData= [];
+      this.gyData= [];
+      this.gzData= [];
   
       this.itemCountCharacteristic = null;
       this.stateCharacteristic = null;
@@ -68,6 +71,9 @@ export default class BLEConnector {
     this.accxData = this.accxData.slice(-50);
     this.accyData = this.accyData.slice(-50);
     this.acczData = this.acczData.slice(-50);
+    this.gxData = this.gxData.slice(-50);
+    this.gyData = this.gyData.slice(-50);
+    this.gzData = this.gzData.slice(-50);
     this.temperatureData = this.temperatureData.slice(-50);
     this.pressureData = this.pressureData.slice(-50);
     this.kalmanPressureData = this.kalmanPressureData.slice(-50);
@@ -103,6 +109,9 @@ export default class BLEConnector {
     this.accxData.push(parsedValue.accX);
     this.accyData.push(parsedValue.accY);
     this.acczData.push(parsedValue.accZ);
+    this.gxData.push(parsedValue.gX);
+    this.gyData.push(parsedValue.gY);
+    this.gzData.push(parsedValue.gZ);
     this.gui.setValue("temperatureGraph", [this.temperatureData, this.kalmanTemperatureData]);
     this.gui.setValue("pressureGraph", [this.pressureData, this.kalmanPressureData]);
     this.gui.setValue("altitudeGraph", [this.altitudeData, this.kalmanAltitudeData]);
@@ -111,15 +120,17 @@ export default class BLEConnector {
     this.gui.setValue("accxGraph", this.accxData);
     this.gui.setValue("accyGraph", this.accyData);
     this.gui.setValue("acczGraph", this.acczData);
+
+    this.gui.setValue("gxGraph", this.gxData);
+    this.gui.setValue("gyGraph", this.gyData);
+    this.gui.setValue("gzGraph", this.gzData);
     this.gui.setValue("pressureDeltaGraph", [this.pressureDeltaData, this.kalmanPressureDeltaData]);
   }
 
   async processCommand() {
     if(this.commandToSend != null) {
       if(this.commandToSend == "reset") {
-        if (confirm('Are you sure you want to reset the device?')) {
-          await this.sendMachineCommand('r');
-        }
+        await this.sendMachineCommand('r');
       }
       if(this.commandToSend == "launchidle") {
         await this.sendMachineCommand('l');
