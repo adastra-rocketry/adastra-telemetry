@@ -49,6 +49,7 @@ export default class BLEConnector {
 
   deregisterMachineUpdates() {
     clearInterval(this.updateInterval)
+    this.vehicleStateCharacteristic.stopNotifications();
     this.vehicleStateCharacteristic.removeEventListener('characteristicvaluechanged', this.vehicleStateCharacteristicChanged.bind(this));
   }
 
@@ -174,12 +175,12 @@ export default class BLEConnector {
   }
 
   async disconnectDevice() {
-    log('Disconnecting from Bluetooth Device...');
-    if (this.bluetoothDevice.gatt.connected) {
+    console.log('Disconnecting from Bluetooth Device...');
+    if (this.device.gatt.connected) {
       this.deregisterMachineUpdates();
       this.device.gatt.disconnect();
     } else {
-      log('> Bluetooth Device is already disconnected');
+      console.log('> Bluetooth Device is already disconnected');
     }
   }
 }
