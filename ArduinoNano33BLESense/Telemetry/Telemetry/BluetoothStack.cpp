@@ -101,8 +101,7 @@ void BluetoothStack::ProcessCommand(State& state) {
 
     switch(command.Type) {
       case 'r':
-        state.vehicleState = Vehicle_State::Idle;
-        state.logger.empty();
+        state.reset();
         WriteCount(state);
         break;
       case 'l':

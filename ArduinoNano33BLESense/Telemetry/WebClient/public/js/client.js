@@ -29,6 +29,7 @@ export default class BLEConnector {
       this.vehicleStateCharacteric = null;
 
       this.updateInterval;
+      this.device = null;
       this.gui.commandListeners.push(this.processGUICommand.bind(this));
   }
 
@@ -42,10 +43,13 @@ export default class BLEConnector {
 
   registerMachineUpdates() {
     this.updateInterval = setInterval(this.readValues.bind(this), 400);
+    this.vehicleStateCharacteristic.addEventListener('characteristicvaluechanged', this.vehicleStateCharacteristicChanged.bind(this));
+    this.vehicleStateCharacteristic.startNotifications();
   }
 
   deregisterMachineUpdates() {
     clearInterval(this.updateInterval)
+    this.vehicleStateCharacteristic.removeEventListener('characteristicvaluechanged', this.vehicleStateCharacteristicChanged.bind(this));
   }
 
   async sendMachineCommand(commandchar, arg1, arg2) {
@@ -65,9 +69,7 @@ export default class BLEConnector {
     await this.commandCharacteristic.writeValue(command);
   }
 
-  async readValues() {
-    if(await this.processCommand()) return;
-
+  async vehicleStateCharacteristicChanged(event) {
     this.accxData = this.accxData.slice(-50);
     this.accyData = this.accyData.slice(-50);
     this.acczData = this.acczData.slice(-50);
@@ -83,14 +85,7 @@ export default class BLEConnector {
     this.altitudeData = this.altitudeData.slice(-50);
     this.kalmanAltitudeData = this.kalmanAltitudeData.slice(-50);
 
-    let value = await this.itemCountCharacteristic.readValue();
-    let count = value.getUint16(0);
-    this.gui.setValue("itemCount", count);
-    value = await this.stateCharacteristic.readValue();
-    let state = value.getUint16(0);
-    this.gui.setValue("state", state);
-
-    value = await this.vehicleStateCharacteristic.readValue();
+    var value = event.target.value;
     var parsedValue = this.parser.parse(value);
 
     this.gui.setValue("temperature", parsedValue.kalmanTemperature);
@@ -127,6 +122,17 @@ export default class BLEConnector {
     this.gui.setValue("pressureDeltaGraph", [this.pressureDeltaData, this.kalmanPressureDeltaData]);
   }
 
+  async readValues() {
+    if(await this.processCommand()) return;
+
+    let value = await this.itemCountCharacteristic.readValue();
+    let count = value.getUint16(0);
+    this.gui.setValue("itemCount", count);
+    value = await this.stateCharacteristic.readValue();
+    let state = value.getUint16(0);
+    this.gui.setValue("state", state);
+  }
+
   async processCommand() {
     if(this.commandToSend != null) {
       if(this.commandToSend == "reset") {
@@ -138,6 +144,9 @@ export default class BLEConnector {
       if(this.commandToSend == "launchparameter") {
         await this.sendMachineCommand('s', this.gui.getValue("launchAltitude"), this.gui.getValue("launchPressure"));
       }
+      if(this.commandToSend == "disconnect") {
+        this.disconnectDevice();
+      }
       this.commandToSend = null;
       return true;
     }
@@ -147,9 +156,9 @@ export default class BLEConnector {
   async connectDevice() {
     try {
       console.log('Requesting Bluetooth Device...');
-      const device = await navigator.bluetooth.requestDevice({filters: [{name: 'AdAstra Telemetry'}], optionalServices: ['0000181c-0000-1000-8000-00805f9b34fb']});
+      this.device = await navigator.bluetooth.requestDevice({filters: [{name: 'AdAstra Telemetry'}], optionalServices: ['0000181c-0000-1000-8000-00805f9b34fb']});
 
-      const server = await device.gatt.connect();
+      const server = await this.device.gatt.connect();
       const service = await server.getPrimaryService('0000181c-0000-1000-8000-00805f9b34fb');
       this.itemCountCharacteristic = await service.getCharacteristic(0x2ac0);
       this.stateCharacteristic = await service.getCharacteristic(0x2ac1);
@@ -161,6 +170,16 @@ export default class BLEConnector {
       this.registerMachineUpdates();
     } catch(ex) {
         console.log(ex);
+    }
+  }
+
+  async disconnectDevice() {
+    log('Disconnecting from Bluetooth Device...');
+    if (this.bluetoothDevice.gatt.connected) {
+      this.deregisterMachineUpdates();
+      this.device.gatt.disconnect();
+    } else {
+      log('> Bluetooth Device is already disconnected');
     }
   }
 }

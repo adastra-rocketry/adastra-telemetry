@@ -16,6 +16,7 @@ class State
   public:
     State();
     void init();
+    void reset();
     Vehicle_State vehicleState = Vehicle_State::Idle;
     DataPoint currentDataPoint;
     void createDataPoint(float pressure, float temperature, float acc_x, float acc_y, float acc_z, float g_x, float g_y, float g_z);

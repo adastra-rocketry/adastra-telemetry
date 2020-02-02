@@ -12,6 +12,12 @@ void State::init() {
   logger.init(sound);
 }
 
+void State::reset() {
+  logger.empty();
+  vehicleState = Vehicle_State::Idle;
+  heighestAltitude = 0.0;
+}
+
 void State::createDataPoint(float pressure, float temperature, float acc_x, float acc_y, float acc_z, float g_x, float g_y, float g_z) {
   DataPoint newItem = {vehicleState, millis(), pressure, temperature, acc_x, acc_y, acc_z, g_x, g_y, g_z};
   processDataPoint(newItem);
