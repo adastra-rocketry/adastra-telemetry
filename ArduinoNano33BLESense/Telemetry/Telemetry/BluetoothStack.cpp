@@ -111,6 +111,7 @@ void BluetoothStack::ProcessCommand(State& state) {
       case 's':
         state.LaunchAltitude = command.Arg1;
         state.PressureNN = command.Arg2;
+        state.reset();
         break;
       default:
         if(DEBUG) {

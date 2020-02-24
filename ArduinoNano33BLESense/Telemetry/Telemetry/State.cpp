@@ -3,6 +3,7 @@
 #include "DataLogger.h"
 #include "Settings.h"
 
+#include <SimpleKalmanFilter.h>
 
 State::State() {
   
@@ -13,9 +14,11 @@ void State::init() {
 }
 
 void State::reset() {
+  
   logger.empty();
   vehicleState = Vehicle_State::Idle;
   heighestAltitude = 0.0;
+  altitudeKalmanFilter = SimpleKalmanFilter(1, 1, 1);
 }
 
 void State::createDataPoint(float pressure, float temperature, float acc_x, float acc_y, float acc_z, float g_x, float g_y, float g_z) {
@@ -29,7 +32,7 @@ void State::createDataPoint(float pressure, float temperature, float acc_x, floa
 }
 
 void State::updateFlightState() {
-  if(vehicleState == Vehicle_State::LaunchIdle && currentDataPoint.G_X > 30) {
+  if(vehicleState == Vehicle_State::LaunchIdle && currentDataPoint.G_X > 20) {
     vehicleState = Vehicle_State::Ascending;
     sound.playSound(400, 500);
   }
