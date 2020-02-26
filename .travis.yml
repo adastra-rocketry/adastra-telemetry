@@ -16,6 +16,7 @@ before_install:
 install:
   # Note that every library should be installed in a seperate command
   - arduino --install-library "ArduinoBLE"
+  - arduino --install-library "SimpleKalmanFilter"
 script:
   - cd ArduinoNano33BLESense/Telemetry/Telemetry
   - build_main_platforms
