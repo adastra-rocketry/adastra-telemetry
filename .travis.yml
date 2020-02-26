@@ -17,6 +17,9 @@ install:
   # Note that every library should be installed in a seperate command
   - arduino --install-library "ArduinoBLE"
   - arduino --install-library "SimpleKalmanFilter"
+  - arduino --install-library "Arduino_HTS221"
+  - arduino --install-library "Arduino_LPS22HB"
+  - arduino --install-library "Arduino_LSM9DS1"
 script:
   - cd ArduinoNano33BLESense/Telemetry/Telemetry
   - build_main_platforms
