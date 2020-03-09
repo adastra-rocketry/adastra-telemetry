@@ -24,6 +24,8 @@ class BluetoothStack
     void Init();
   private:
     Debug_LED _led{23,24,22};
+
+    unsigned long previousMillis = 0;
     
     BLEService _loggerService{"181C"};
     BLECharacteristic _commandServiceChar{"19B10001-E8F2-537E-4F6C-D104768A1214", BLERead | BLEWrite, sizeof(Command)};

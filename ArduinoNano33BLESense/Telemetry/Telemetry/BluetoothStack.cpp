@@ -77,9 +77,14 @@ void BluetoothStack::WriteState(State& stateObj) {
 
 
 void BluetoothStack::WriteCurrentDataPoint(State& stateObj) {
-    unsigned char b[sizeof(stateObj.currentDataPoint)];
-    memcpy(b, &stateObj.currentDataPoint, sizeof(stateObj.currentDataPoint));
-    _currentDataPointServiceChar.writeValue(b, sizeof(b)); // and publish it via BT
+    long currentMillis = millis();
+    // if 200ms have passed
+    if(currentMillis - previousMillis >= BLE_UPDATE_INTERVAL) {
+      unsigned char b[sizeof(stateObj.currentDataPoint)];
+      memcpy(b, &stateObj.currentDataPoint, sizeof(stateObj.currentDataPoint));
+      _currentDataPointServiceChar.writeValue(b, sizeof(b)); // and publish it via BT
+      previousMillis = currentMillis;
+    }
 }
 
 void BluetoothStack::ProcessCommand(State& state) {

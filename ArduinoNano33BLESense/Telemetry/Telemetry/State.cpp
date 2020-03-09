@@ -32,12 +32,16 @@ void State::createDataPoint(float pressure, float temperature, float acc_x, floa
 }
 
 void State::updateFlightState() {
-  if(vehicleState == Vehicle_State::LaunchIdle && currentDataPoint.G_X > 20) {
+  if(vehicleState == Vehicle_State::LaunchIdle && currentDataPoint.Acc_X > 1) {
     vehicleState = Vehicle_State::Ascending;
     sound.playSound(400, 500);
   }
   if(vehicleState == Vehicle_State::Ascending && currentDataPoint.KalmanAltitude < heighestAltitude - 2) {
     vehicleState = Vehicle_State::Descending;
+    sound.playSound(400, 500);
+  }
+  if(vehicleState == Vehicle_State::Descending && currentDataPoint.KalmanAltitude < LaunchAltitude + 5) {
+    vehicleState = Vehicle_State::Landed;
     sound.playSound(400, 500);
   }
   
