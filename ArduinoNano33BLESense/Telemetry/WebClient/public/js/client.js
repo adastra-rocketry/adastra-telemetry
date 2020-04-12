@@ -166,7 +166,7 @@ export default class BLEConnector {
       this.commandCharacteristic = await service.getCharacteristic('19b10001-e8f2-537e-4f6c-d104768a1214');
       this.vehicleStateCharacteristic = await service.getCharacteristic(0x2ac2);
 
-      this.gui.elements.modal.remove();
+      this.gui.elements.modal.hide();
 
       this.registerMachineUpdates();
     } catch(ex) {
@@ -179,6 +179,7 @@ export default class BLEConnector {
     if (this.device.gatt.connected) {
       this.deregisterMachineUpdates();
       this.device.gatt.disconnect();
+      this.gui.elements.modal.show();
     } else {
       console.log('> Bluetooth Device is already disconnected');
     }
