@@ -24,7 +24,9 @@ void State::reset() {
 void State::createDataPoint(float pressure, float temperature, float acc_x, float acc_y, float acc_z, float g_x, float g_y, float g_z) {
   DataPoint newItem = {vehicleState, millis(), pressure, temperature, acc_x, acc_y, acc_z, g_x, g_y, g_z};
   processDataPoint(newItem);
-  if(vehicleState != Vehicle_State::Idle && vehicleState != Vehicle_State::Landed) {
+
+  // test if landed in the future too: //  && vehicleState != Vehicle_State::Landed
+  if(vehicleState != Vehicle_State::Idle) {
     logger.saveValue(newItem);
   }
   currentDataPoint = newItem;
