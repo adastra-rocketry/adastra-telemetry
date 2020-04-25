@@ -24,6 +24,8 @@ void readSensors() {
   sensors.readGyroscope(g_x, g_y, g_z);
 
   state.createDataPoint(pressure, temperature, acc_x, acc_y, acc_z, g_x, g_y, g_z);
+  state.saveCurrentDataPoint();
+  state.updateFlightState();
 }
 
 
@@ -49,10 +51,8 @@ void loop() {
   ble.DoLoop(state);
   
   long currentMillis = millis();
-  // if 200ms have passed
   if(currentMillis - previousMillis >= SAVE_INTERVAL) {
     readSensors();
-    state.updateFlightState();
     previousMillis = currentMillis;
   }
 }
