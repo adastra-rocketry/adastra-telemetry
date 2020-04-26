@@ -30,8 +30,8 @@ class BluetoothStack
     BLEService _loggerService{"181C"};
     BLECharacteristic _commandServiceChar{"19B10001-E8F2-537E-4F6C-D104768A1214", BLERead | BLEWrite, sizeof(Command)};
 
-    BLECharacteristic _itemCountServiceChar{"2AC0", BLERead, sizeof(int)};
-    BLECharacteristic _stateServiceChar{"2AC1", BLERead, sizeof(int)};
+    BLECharacteristic _itemCountServiceChar{"2AC0", BLERead | BLEIndicate, sizeof(int)};
+    BLECharacteristic _stateServiceChar{"2AC1", BLERead | BLEIndicate, sizeof(int)};
     BLECharacteristic _currentDataPointServiceChar{"2AC2", BLERead | BLENotify | BLEIndicate, sizeof(DataPoint)};
 
     void ProcessCommand(State& state);

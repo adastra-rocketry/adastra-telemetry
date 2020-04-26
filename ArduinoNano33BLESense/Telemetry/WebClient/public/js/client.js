@@ -38,19 +38,24 @@ export default class BLEConnector {
       await this.connectDevice();
     } else {
       this.commandToSend = command;
+      
+      if(await this.processCommand()) return;
     }
   }
 
   registerMachineUpdates() {
-    this.updateInterval = setInterval(this.readValues.bind(this), 400);
     this.vehicleStateCharacteristic.addEventListener('characteristicvaluechanged', this.vehicleStateCharacteristicChanged.bind(this));
     this.vehicleStateCharacteristic.startNotifications();
+    this.itemCountCharacteristic.addEventListener('characteristicvaluechanged', this.itemCountCharacteristicChanged.bind(this));
+    this.itemCountCharacteristic.startNotifications();
   }
 
   deregisterMachineUpdates() {
-    clearInterval(this.updateInterval)
     this.vehicleStateCharacteristic.stopNotifications();
     this.vehicleStateCharacteristic.removeEventListener('characteristicvaluechanged', this.vehicleStateCharacteristicChanged.bind(this));
+    this.itemCountCharacteristic.stopNotifications();
+    this.itemCountCharacteristic.removeEventListener('characteristicvaluechanged', this.itemCountCharacteristicChanged.bind(this));
+
   }
 
   async sendMachineCommand(commandchar, arg1, arg2) {
@@ -121,17 +126,14 @@ export default class BLEConnector {
     this.gui.setValue("gyGraph", this.gyData);
     this.gui.setValue("gzGraph", this.gzData);
     this.gui.setValue("pressureDeltaGraph", [this.pressureDeltaData, this.kalmanPressureDeltaData]);
+
+    this.gui.setValue("state", parsedValue.state);
   }
 
-  async readValues() {
-    if(await this.processCommand()) return;
-
-    let value = await this.itemCountCharacteristic.readValue();
+  async itemCountCharacteristicChanged() {
+    let value = event.target.value;
     let count = value.getUint16(0);
     this.gui.setValue("itemCount", count);
-    value = await this.stateCharacteristic.readValue();
-    let state = value.getUint16(0);
-    this.gui.setValue("state", state);
   }
 
   async processCommand() {
