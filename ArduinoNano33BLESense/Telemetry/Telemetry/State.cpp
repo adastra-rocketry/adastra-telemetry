@@ -15,7 +15,7 @@ void State::init() {
 
 void State::reset() {
   
-  logger.empty();
+  logger.reset();
   vehicleState = Vehicle_State::Idle;
   heighestAltitude = 0.0;
   altitudeKalmanFilter = SimpleKalmanFilter(1, 1, 1);
@@ -45,11 +45,11 @@ void State::updateFlightState() {
     vehicleState = Vehicle_State::Ascending;
     sound.playSound(400, 500);
   }
-  if(vehicleState == Vehicle_State::Ascending && currentDataPoint.KalmanAltitude < heighestAltitude - 2) {
+  else if(vehicleState == Vehicle_State::Ascending && currentDataPoint.KalmanAltitude < heighestAltitude - 2) {
     vehicleState = Vehicle_State::Descending;
     sound.playSound(400, 500);
   }
-  if(vehicleState == Vehicle_State::Descending && currentDataPoint.KalmanAltitude < LaunchAltitude + 5) {
+  else if(vehicleState == Vehicle_State::Descending && currentDataPoint.KalmanAltitude < LaunchAltitude + 5) {
     vehicleState = Vehicle_State::Landed;
     sound.playSound(400, 500);
   }

@@ -36,6 +36,8 @@ export default class GUI {
       gxGraph: TD.graph({gridx: 10, gridy: 25, x:860,y:470,width:400,height:100,label:"Gyro X",data: []}),
       gyGraph: TD.graph({gridx: 10, gridy: 25, x:860,y:580,width:400,height:100,label:"Gyro Y",data: []}),
       gzGraph: TD.graph({gridx: 10, gridy: 25, x:860,y:690,width:400,height:100,label:"Gyro Z",data: []}),
+
+      three: this.createThreeElement({width: 300, height: 300, x: 400, y: 400}),
       
       modal: TD.modal({x:10,y:10,width:1400,height:800,label:"Click to connect",onchange:() => this.sendCommand("connect")}),
     }
@@ -43,6 +45,44 @@ export default class GUI {
     for (var i in this.elements) {
       document.body.appendChild(this.elements[i]);
     }
+
+    
+    this.animate();
+  }
+
+  createThreeElement(opts) {
+    this.threeContainer = document.createElement('div');
+    this.camera = new THREE.PerspectiveCamera( 70, opts.width / opts.height, 0.01, 10 );
+    this.camera.position.z = 1;
+
+    this.scene = new THREE.Scene();
+
+    this.geometry = new THREE.BoxGeometry( 0.2, 0.2, 0.2 );
+    this.material = new THREE.MeshNormalMaterial();
+
+    this.mesh = new THREE.Mesh( this.geometry, this.material );
+    this.scene.add( this.mesh );
+
+    this.threeContainer.setValue = (values) => {
+      this.mesh.rotation.x = values.x;
+      this.mesh.rotation.y = values.y;
+      this.mesh.rotation.z = values.z;
+    };
+
+    this.renderer = new THREE.WebGLRenderer( { antialias: true } );
+    this.renderer.setSize( opts.width, opts.height );
+    this.threeContainer.appendChild( this.renderer.domElement );
+    this.threeContainer.style="width:"+opts.width+"px;height:"+opts.height+"px;left:"+opts.x+"px;top:"+opts.y+"px;";
+    this.threeContainer.classList.add('td');
+    this.threeContainer.classList.add('td_graph');
+    return this.threeContainer;
+  }
+
+  animate() {
+
+    requestAnimationFrame( this.animate.bind(this) );
+    this.renderer.render( this.scene, this.camera );
+
   }
 
   getValue(name) {

@@ -47,7 +47,7 @@ class DataLogger
     DataLogger();
     void init(Sound& sound);
     void saveValue(DataPoint& newValue);
-    void empty();
+    void reset();
     int getCounter();
   private:
     bool SDavailable = true;

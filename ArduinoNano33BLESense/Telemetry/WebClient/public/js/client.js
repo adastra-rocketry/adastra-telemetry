@@ -125,6 +125,8 @@ export default class BLEConnector {
     this.gui.setValue("gxGraph", this.gxData);
     this.gui.setValue("gyGraph", this.gyData);
     this.gui.setValue("gzGraph", this.gzData);
+
+    this.gui.setValue("three", {x: parsedValue.gX, y: parsedValue.gY, z: parsedValue.gZ});
     this.gui.setValue("pressureDeltaGraph", [this.pressureDeltaData, this.kalmanPressureDeltaData]);
 
     this.gui.setValue("state", parsedValue.state);

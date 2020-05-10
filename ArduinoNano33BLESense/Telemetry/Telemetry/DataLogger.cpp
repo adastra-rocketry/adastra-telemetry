@@ -80,7 +80,7 @@ void DataLogger::createCsvLine(DataPoint& dataPoint) {
   }  
 }
 
-void DataLogger::empty() {
+void DataLogger::reset() {
   if(DEBUG) Serial.println("clearing");
   if(SDavailable) {
     dataFile.close();

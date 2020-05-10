@@ -5,6 +5,7 @@ export default class DataPointParser {
 
   parse(value) {
     let offset = 0;
+    let orderOfMag = (Math.PI/180);
 
     let result = {
       state: value.getUint16(0 + offset, true),
@@ -15,9 +16,9 @@ export default class DataPointParser {
       accY: value.getFloat32(20 + offset, true),
       accZ: value.getFloat32(24 + offset, true),
 
-      gX: value.getFloat32(28 + offset, true),
-      gY: value.getFloat32(32 + offset, true),
-      gZ: value.getFloat32(36 + offset, true),
+      gX: value.getFloat32(28 + offset, true) * orderOfMag,
+      gY: value.getFloat32(32 + offset, true) * orderOfMag,
+      gZ: value.getFloat32(36 + offset, true) * orderOfMag,
 
       pressureDelta: value.getFloat32(40 + offset, true),
       kalmanPressureDelta: value.getFloat32(44 + offset, true),
